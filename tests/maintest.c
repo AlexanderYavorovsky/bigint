@@ -29,8 +29,8 @@ int main(int argc, char *argv[])
     bigint_resize(x, 5);
     printf("\nlen: %li\n%s\n", x->len, bitostr(x));
 
-    bigint_normalize(x);
-    printf("\nlen: %li\n%s\n", x->len, bitostr(x));
+    if (!bigint_normalize(x))
+        printf("\nlen: %li\n%s\n", x->len, bitostr(x));
 
     bigint_free(x);
     free(str);

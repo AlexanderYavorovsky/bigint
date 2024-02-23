@@ -86,7 +86,7 @@ bool bigint_resize(BigInt *x, size_t newlen)
     x->len = newlen;
 
     if (newlen > oldlen)
-        bigint_fillzero(x, oldlen, newlen - oldlen);
+        return bigint_fillzero(x, oldlen, newlen - oldlen);
 
     return 0;
 }
@@ -107,9 +107,7 @@ bool bigint_normalize(BigInt *x)
 
     newlen = cnt + 1;
 
-    bigint_resize(x, newlen);
-
-    return 0;
+    return bigint_resize(x, newlen);
 }
 
 BigInt *strtobi(char *str)
