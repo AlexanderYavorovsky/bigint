@@ -16,7 +16,6 @@ bool bigint_free(BigInt *x)
         free(x);
     }
     
-
     return 0;
 }
 
@@ -74,4 +73,26 @@ BigInt *strtobi(char *str)
     }
     
     return x;
+}
+
+char *bitostr(const BigInt *x)
+{
+    int offset = 0;
+    char *str = malloc(sizeof(char) * (x->len + (x->sign == -1)));
+
+    if (str == NULL)
+        return NULL;
+
+    if (x->sign == -1)
+    {
+        str[0] = '-';
+        offset = 1;
+    }
+
+    for (size_t i = 0; i < x->len; i++)
+    {
+        str[i + offset] = x->digits[x->len - i - 1] + '0';
+    }
+
+    return str;
 }
