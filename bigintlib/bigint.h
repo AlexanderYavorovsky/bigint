@@ -5,19 +5,20 @@
 
 typedef struct 
 {
-    char *digits;
+    uint8_t *digits;
     int8_t sign;
     size_t len;
 } BigInt;
 
-BigInt *bigint_init(void);
 bool bigint_free(BigInt *x);
-void bigint_fillzero(BigInt *x, size_t n);
-void bigint_normalize(BigInt *x);
+BigInt *bigint_init(void);
+BigInt *bigint_init_n(size_t len);
+bool bigint_fillzero(BigInt *x, size_t n);
+bool bigint_normalize(BigInt *x);
 
 bool bigint_isless(BigInt a, BigInt b);
 
-BigInt *strtobi(char *num);
+BigInt *strtobi(char *str);
 char *bitostr(const BigInt *x);
 
 BigInt *bigint_sum(const BigInt *a, const BigInt *b);

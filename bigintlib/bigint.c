@@ -1,17 +1,77 @@
 /* Yavorovsky Alexander, 22.02.2024 */
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "bigint.h"
 
+bool bigint_free(BigInt *x)
+{
+    if (x != NULL)
+    {
+        if (x->digits != NULL)
+        {
+            free(x->digits);
+        }
+        free(x);
+    }
+    
+
+    return 0;
+}
+
 BigInt *bigint_init(void)
 {
-    BigInt *res = malloc(sizeof(BigInt));
+    BigInt *x = malloc(sizeof(BigInt));
 
-    if (res == NULL)
+    if (x == NULL)
         return NULL;
 
-    /* digits? sign? */
+    return x;
+}
 
-    return res;
+BigInt *bigint_init_n(size_t len)
+{
+    BigInt *x = bigint_init();
+    if(x == NULL)
+        return NULL;
+    
+    x->digits = malloc(len);
+    if (x->digits == NULL)
+    {
+        free(x);
+        return NULL;
+    }
+
+    x->len = len;
+    x->sign = 1;
+
+    return x;
+}
+
+BigInt *strtobi(char *str)
+{
+    BigInt *x;
+    size_t len = strlen(str);
+    int8_t sign = 1;
+    uint8_t offset = 0;
+
+    if (str[0] == '-')
+    {
+        sign = -1;
+        offset = 1;
+    }
+    else if (str[0] == '+')
+    {
+        offset = 1;
+    }
+
+    x = bigint_init_n(len - offset);
+
+    for (size_t i = 0; i < len - offset; i++)
+    {
+        x->digits[i] = str[len - i - 1] - '0';
+    }
+    
+    return x;
 }
