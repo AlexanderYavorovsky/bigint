@@ -13,10 +13,11 @@ typedef struct
 bool bigint_free(BigInt *x);
 BigInt *bigint_init(void);
 BigInt *bigint_init_n(size_t len);
-bool bigint_fillzero(BigInt *x, size_t n);
+bool bigint_fillzero(BigInt *x, size_t beg, size_t n);
+bool bigint_resize(BigInt *x, size_t newlen);
 bool bigint_normalize(BigInt *x);
 
-bool bigint_isless(BigInt a, BigInt b);
+bool bigint_isless(const BigInt *a, const BigInt *b);
 
 BigInt *strtobi(char *str);
 char *bitostr(const BigInt *x);
