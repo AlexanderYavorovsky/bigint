@@ -7,12 +7,15 @@
 
 int main(int argc, char *argv[])
 {
-    BigInt *x;
+    BigInt *x, *y;
     char *str;
     printf("test\n");
 
-    x = strtobi("-123");
+    x = strtobi("3214");
     str = bitostr(x);
+    y = strtobi("-13");
+
+    printf("Is less: %i\n", bigint_isless(x, y));
 
     printf("Sign: %i; Len: %li\n", x->sign, x->len);
     for (size_t i = 0; i < x->len; i++)
@@ -26,7 +29,7 @@ int main(int argc, char *argv[])
     str = bitostr(x);
     printf("\n\n%s\n", str);
 
-    bigint_resize(x, 5);
+    bigint_resize(x, 3);
     printf("\nlen: %li\n%s\n", x->len, bitostr(x));
 
     if (!bigint_normalize(x))

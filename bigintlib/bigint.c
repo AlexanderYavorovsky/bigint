@@ -110,6 +110,31 @@ bool bigint_normalize(BigInt *x)
     return bigint_resize(x, newlen);
 }
 
+bool bigint_isless(const BigInt *a, const BigInt *b)
+{
+    if (a == NULL || b == NULL)
+        return 0;
+
+    if (a->sign != b->sign)
+        return a->sign != 1;
+
+    if (a->len < b->len)
+        return a->sign == 1;
+    if (a->len > b->len)
+        return a->sign != 1;
+
+    for (size_t i = 0; i < a->len; i++)
+    {
+        if (a->digits[a->len - i - 1] < b->digits[b->len - i - 1])
+            return a->sign == 1;
+            
+        if (a->digits[a->len - i - 1] > b->digits[b->len - i - 1])
+            return a->sign != 1;
+    }
+    
+    return 0;
+}
+
 BigInt *strtobi(char *str)
 {
     BigInt *x;
