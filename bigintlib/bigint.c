@@ -169,7 +169,7 @@ BigInt *strtobi(char *str)
 char *bitostr(const BigInt *x)
 {
     uint8_t offset = 0;
-    char *str = malloc(sizeof(char) * (x->len + (x->sign == -1)));
+    char *str = malloc(sizeof(char) * (x->len + 1 + (x->sign == -1)));
 
     if (str == NULL)
         return NULL;

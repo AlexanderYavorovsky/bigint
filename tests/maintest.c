@@ -26,16 +26,24 @@ int main(int argc, char *argv[])
     printf("\n\n%s\n", str);
 
     bigint_fillzero(x, 0, 2);
+    free(str);
     str = bitostr(x);
     printf("\n\n%s\n", str);
 
     bigint_resize(x, 3);
-    printf("\nlen: %li\n%s\n", x->len, bitostr(x));
+    free(str);
+    str = bitostr(x);
+    printf("\nlen: %li\n%s\n", x->len, str);
 
     if (!bigint_normalize(x))
-        printf("\nlen: %li\n%s\n", x->len, bitostr(x));
+    {
+        free(str);
+        str = bitostr(x);
+        printf("\nlen: %li\n%s\n", x->len, str);
+    }
 
     bigint_free(x);
+    bigint_free(y);
     free(str);
 
     return 0;
