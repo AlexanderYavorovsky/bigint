@@ -66,6 +66,10 @@ BigInt *strtobi(char *str)
     }
 
     x = bigint_init_n(len - offset);
+    if (x == NULL)
+        return NULL;
+
+    x->sign = sign;
 
     for (size_t i = 0; i < len - offset; i++)
     {
