@@ -7,44 +7,27 @@
 
 int main(int argc, char *argv[])
 {
-    BigInt *x, *y;
-    char *str;
+    BigInt *x, *y, *r;
+    char *sx, *sy, *sr;
+    uint8_t base = 2;
     printf("test\n");
 
-    x = strtobi("3214");
-    str = bitostr(x);
-    y = strtobi("-13");
+    x = strtobi("1000");
+    sx = bitostr(x);
+    y = strtobi("11");
+    sy = bitostr(y);
 
-    printf("Is less: %i\n", bigint_isless(x, y));
+    r = bigint_subtract(x, y, base);
+    sr = bitostr(r);
 
-    printf("Sign: %i; Len: %li\n", x->sign, x->len);
-    for (size_t i = 0; i < x->len; i++)
-    {
-        printf("%i", x->digits[x->len - i - 1]);
-    }
-
-    printf("\n\n%s\n", str);
-
-    bigint_fillzero(x, 0, 2);
-    free(str);
-    str = bitostr(x);
-    printf("\n\n%s\n", str);
-
-    bigint_resize(x, 3);
-    free(str);
-    str = bitostr(x);
-    printf("\nlen: %li\n%s\n", x->len, str);
-
-    if (!bigint_normalize(x))
-    {
-        free(str);
-        str = bitostr(x);
-        printf("\nlen: %li\n%s\n", x->len, str);
-    }
+    printf("%s - %s = %s\n", sx, sy, sr);
 
     bigint_free(x);
     bigint_free(y);
-    free(str);
+    bigint_free(r);
+    free(sx);
+    free(sy);
+    free(sr);
 
     return 0;
 }

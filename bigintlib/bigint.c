@@ -110,6 +110,27 @@ bool bigint_normalize(BigInt *x)
     return bigint_resize(x, newlen);
 }
 
+BigInt *bigint_copy(const BigInt *x)
+{
+    BigInt *copy;
+
+    if (x == NULL || x->len <= 0)
+        return NULL;
+
+    copy = bigint_init_n(x->len);
+    if (copy == NULL)
+        return NULL;
+
+    copy->sign = x->sign;
+
+    for (size_t i = 0; i < x->len; i++)
+    {
+        copy->digits[i] = x->digits[i];
+    }
+
+    return copy;
+}
+
 bool bigint_isless(const BigInt *a, const BigInt *b)
 {
     if (a == NULL || b == NULL)
@@ -189,4 +210,139 @@ char *bitostr(const BigInt *x)
     str[slen - 1] = '\0'; 
 
     return str;
+}
+
+/* restriction: 2 <= base <= 10 */
+BigInt *bigint_sum(const BigInt *a, const BigInt *b, uint8_t base)
+{
+    BigInt *x;
+    uint8_t sum = 0;
+    uint8_t carry = 0;
+
+    if (a == NULL || b == NULL)
+        return NULL;
+    
+    if (a->digits == NULL || b->digits == NULL)
+        return NULL;
+    
+    if (base < 2 || base > 10)
+        return NULL;
+
+    if (bigint_isless(a, b))
+    {
+        return bigint_sum(b, a, base);
+    }
+    if (b->sign != 1)
+    {
+        BigInt *tmp = bigint_copy(b);
+        if (tmp == NULL)
+            return NULL;
+
+        tmp->sign = 1;
+
+        x = bigint_subtract(a, tmp, base);
+        bigint_free(tmp);
+
+        return x;
+    }
+
+    x = bigint_init_n(a->len + 1);
+    if (x == NULL)
+        return NULL;
+
+    for (size_t i = 0; i < a->len; i++)
+    {
+        sum = a->digits[i] + carry;
+        if (i < b->len)
+            sum += b->digits[i];
+        
+        if (sum >= base)
+        {
+            carry = sum / base;
+            sum %= base;
+        }
+        else
+        {
+            carry = 0;
+        }
+
+        x->digits[i] = sum;
+    }
+
+    if (carry > 0)
+    {
+        x->digits[x->len - 1] = carry;
+    }
+    else
+    {
+        bigint_resize(x, x->len - 1);
+    }
+
+    return x;
+}
+
+/* 2 <= base <= 10 */
+BigInt *bigint_subtract(const BigInt *a, const BigInt *b, uint8_t base)
+{
+    BigInt *x;
+    int8_t diff = 0;
+    int8_t borrow = 0;
+
+    if (a == NULL || b == NULL)
+        return NULL;
+    
+    if (a->digits == NULL || b->digits == NULL)
+        return NULL;
+    
+    if (base < 2 || base > 10)
+        return NULL;
+
+    if (bigint_isless(a, b))
+    {
+        x = bigint_subtract(b, a, base);
+        x->sign *= -1;
+
+        return x;
+    }
+    if (b->sign != 1)
+    {
+        BigInt *tmp = bigint_copy(b);
+        if (tmp == NULL)
+            return NULL;
+
+        tmp->sign = 1;
+
+        x = bigint_sum(a, tmp, base);
+        bigint_free(tmp);
+
+        return x;
+    }
+
+    x = bigint_init_n(a->len);
+    if (x == NULL)
+        return NULL;
+
+    for (size_t i = 0; i < a->len; i++)
+    {
+        diff = a->digits[i] + borrow;
+        if (i < b->len)
+            diff -= b->digits[i];
+        
+        if (diff < 0)
+        {
+            borrow = -1;
+            if (i != a->len - 1)
+                diff += base;
+        }
+        else
+        {
+            borrow = 0;
+        }
+
+        x->digits[i] = diff;
+    }
+
+    bigint_normalize(x);
+
+    return x;
 }
