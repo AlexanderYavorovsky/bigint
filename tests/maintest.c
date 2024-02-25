@@ -388,6 +388,47 @@ MU_TEST_SUITE(suite_sum)
     MU_RUN_TEST(test_sum10_negpos); 
 }
 
+MU_TEST(test_sub10_zero)
+{
+    BigInt *zero = strtobi("0");
+    BigInt *x = strtobi("123");
+    BigInt *xneg = strtobi("-123");
+    uint8_t base = 10;
+    BigInt *diff_pos = bigint_subtract(x, zero, base);
+    BigInt *diff_neg = bigint_subtract(xneg, zero, base);
+
+    mu_check(bigint_iseq(x, diff_pos));
+    mu_check(bigint_iseq(xneg, diff_neg));
+
+    bigint_free(zero);
+    bigint_free(x);
+    bigint_free(xneg);
+    bigint_free(diff_pos);
+    bigint_free(diff_neg);
+}
+
+MU_TEST(test_sub10_pospos)
+{
+    BigInt *a = strtobi("341");
+    BigInt *b = strtobi("932");
+    BigInt *actual = strtobi("-591");
+    uint8_t base = 10;
+    BigInt *diff = bigint_subtract(a, b, base);
+
+    mu_check(bigint_iseq(actual, diff));
+
+    bigint_free(a);
+    bigint_free(b);
+    bigint_free(actual);
+    bigint_free(diff);
+}
+
+MU_TEST_SUITE(suite_sub)
+{
+    MU_RUN_TEST(test_sub10_zero);
+    MU_RUN_TEST(test_sub10_pospos);
+}
+
 int main(int argc, char *argv[])
 {
     MU_RUN_SUITE(suite_init);
@@ -397,6 +438,7 @@ int main(int argc, char *argv[])
     MU_RUN_SUITE(suite_normalize);
     MU_RUN_SUITE(suite_iseq);
     MU_RUN_SUITE(suite_sum);
+    MU_RUN_SUITE(suite_sub);
 
     MU_REPORT();
 
