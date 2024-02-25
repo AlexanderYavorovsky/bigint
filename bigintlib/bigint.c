@@ -156,6 +156,20 @@ bool bigint_isless(const BigInt *a, const BigInt *b)
     return 0;
 }
 
+bool bigint_iszero(const BigInt *x)
+{
+    if (x == NULL || x->digits == NULL)
+        return 0;
+
+    for (size_t i = 0; i < x->len; i++)
+    {
+        if (x->digits[i] != 0)
+            return 0;
+    }
+
+    return 1;
+}
+
 BigInt *strtobi(char *str)
 {
     BigInt *x;
@@ -340,6 +354,110 @@ BigInt *bigint_subtract(const BigInt *a, const BigInt *b, uint8_t base)
         }
 
         x->digits[i] = diff;
+    }
+
+    bigint_normalize(x);
+
+    return x;
+}
+
+BigInt *_multiply_digit(const BigInt *a, uint8_t digit, uint8_t base, size_t offset)
+{
+    BigInt *x;
+    uint8_t prod = 0;
+    uint8_t carry = 0;
+
+    if (a == NULL || a->digits == NULL || digit > 9)
+        return NULL;
+
+    if (base < 2 || base > 10)
+        return NULL;
+
+    x = bigint_init_n(a->len + 1 + offset);
+    if (x == NULL)
+        return NULL;
+
+    bigint_fillzero(x, 0, offset);
+
+    for (size_t i = 0; i < a->len; i++)
+    {
+        prod = a->digits[i] * digit + carry;
+        if (prod >= base)
+        {
+            carry = prod / base;
+            prod %= base;
+        }
+        else
+        {
+            carry = 0;
+        }
+
+        x->digits[i + offset] = prod;
+    }
+
+    if (carry > 0)
+    {
+        x->digits[x->len - 1] = carry;
+    }
+    else
+    {
+        bigint_resize(x, x->len - 1);
+    }
+
+    return x;
+}
+
+BigInt *bigint_multiply(const BigInt *a, const BigInt *b, uint8_t base)
+{
+    BigInt *x;
+
+    if (a == NULL || b == NULL)
+        return NULL;
+
+    if (a->digits == NULL || b->digits == NULL)
+        return NULL;
+
+    if (base < 2 || base > 10)
+        return NULL;
+
+    if (bigint_isless(a, b))
+    {
+        return bigint_multiply(b, a, base);
+    }
+    if (b->sign != 1)
+    {
+        BigInt *tmp = bigint_copy(b);
+        if (tmp == NULL)
+            return NULL;
+
+        tmp->sign = 1;
+        x = bigint_multiply(a, tmp, base);
+
+        if (!bigint_iszero(a))
+            x->sign *= -1;
+
+        bigint_free(tmp);
+
+        return x;
+    }
+
+    x = bigint_init_n(b->len + 1);
+    if (x == NULL)
+        return NULL;
+
+    bigint_fillzero(x, 0, x->len);
+
+    for (size_t i = 0; i < b->len; i++)
+    {
+        if (b->digits[i] == 0)
+            continue;
+
+        BigInt *prod = _multiply_digit(a, b->digits[i], base, i);
+        BigInt *tmp = x;
+
+        x = bigint_sum(x, prod, base);
+        bigint_free(tmp);
+        bigint_free(prod);
     }
 
     bigint_normalize(x);

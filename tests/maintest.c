@@ -9,18 +9,18 @@ int main(int argc, char *argv[])
 {
     BigInt *x, *y, *r;
     char *sx, *sy, *sr;
-    uint8_t base = 2;
+    uint8_t base = 10;
     printf("test\n");
 
-    x = strtobi("1000");
+    x = strtobi("-102");
     sx = bitostr(x);
-    y = strtobi("11");
+    y = strtobi("-19");
     sy = bitostr(y);
 
-    r = bigint_subtract(x, y, base);
+    r = bigint_multiply(x, y, base);
     sr = bitostr(r);
 
-    printf("%s - %s = %s\n", sx, sy, sr);
+    printf("%s * %s = %s\n", sx, sy, sr);
 
     bigint_free(x);
     bigint_free(y);
