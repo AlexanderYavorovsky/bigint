@@ -1,6 +1,5 @@
 /* Yavorovsky Alexander, 23.02.2024 */
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
 #include <string.h>
@@ -399,7 +398,7 @@ int main(int argc, char *argv[])
     MU_RUN_SUITE(suite_iseq);
     MU_RUN_SUITE(suite_sum);
 
-	MU_REPORT();
+    MU_REPORT();
 
-	return MU_EXIT_CODE;
+    return MU_EXIT_CODE;
 }
