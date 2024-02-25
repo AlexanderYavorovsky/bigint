@@ -36,20 +36,6 @@ MU_TEST_SUITE(suite_init)
     MU_RUN_TEST(test_init_min);
 }
 
-MU_TEST(test_free)
-{
-    BigInt *x = bigint_init_n(10);
-
-    bigint_free(x);
-
-    mu_check(x == NULL);
-}
-
-MU_TEST_SUITE(suite_free)
-{
-    MU_RUN_TEST(test_free);
-}
-
 MU_TEST(test_str_pos)
 {
     char str[] = "1234567890";
@@ -168,10 +154,8 @@ MU_TEST_SUITE(suite_str)
 int main(int argc, char *argv[])
 {
     MU_RUN_SUITE(suite_init);
-    MU_RUN_SUITE(suite_free);
     MU_RUN_SUITE(suite_str);
 	MU_REPORT();
+
 	return MU_EXIT_CODE;
-    
-    
 }
