@@ -429,6 +429,73 @@ MU_TEST_SUITE(suite_sub)
     MU_RUN_TEST(test_sub10_pospos);
 }
 
+MU_TEST(test_mul10_zero)
+{
+    BigInt *zero = strtobi("0");
+    BigInt *x = strtobi("123");
+    BigInt *xneg = strtobi("-123");
+    uint8_t base = 10;
+    BigInt *mul_left = bigint_multiply(zero, x, base);
+    BigInt *mul_right = bigint_multiply(x, zero, base);
+    BigInt *mul_neg = bigint_multiply(xneg, zero, base);
+
+    mu_check(bigint_iseq(zero, mul_left));
+    mu_check(bigint_iseq(zero, mul_right));
+    mu_check(bigint_iseq(zero, mul_neg));
+
+    bigint_free(zero);
+    bigint_free(x);
+    bigint_free(xneg);
+    bigint_free(mul_left);
+    bigint_free(mul_right);
+    bigint_free(mul_neg);
+}
+
+MU_TEST(test_mul10_one)
+{
+    BigInt *one = strtobi("1");
+    BigInt *x = strtobi("123");
+    BigInt *xneg = strtobi("-123");
+    uint8_t base = 10;
+    BigInt *mul_left = bigint_multiply(one, x, base);
+    BigInt *mul_right = bigint_multiply(x, one, base);
+    BigInt *mul_neg = bigint_multiply(xneg, one, base);
+
+    mu_check(bigint_iseq(x, mul_left));
+    mu_check(bigint_iseq(x, mul_right));
+    mu_check(bigint_iseq(xneg, mul_neg));
+
+    bigint_free(one);
+    bigint_free(x);
+    bigint_free(xneg);
+    bigint_free(mul_left);
+    bigint_free(mul_right);
+    bigint_free(mul_neg);
+}
+
+MU_TEST(test_mul10_negpos)
+{
+    BigInt *a = strtobi("-1109");
+    BigInt *b = strtobi("29480");
+    BigInt *actual = strtobi("-32693320");
+    uint8_t base = 10;
+    BigInt *mul = bigint_multiply(a, b, base);
+
+    mu_check(bigint_iseq(actual, mul));
+
+    bigint_free(a);
+    bigint_free(b);
+    bigint_free(actual);
+    bigint_free(mul);
+}
+
+MU_TEST_SUITE(suite_mul)
+{
+    MU_RUN_TEST(test_mul10_zero);
+    MU_RUN_TEST(test_mul10_one);
+    MU_RUN_TEST(test_mul10_negpos);
+}
+
 int main(int argc, char *argv[])
 {
     MU_RUN_SUITE(suite_init);
@@ -439,6 +506,7 @@ int main(int argc, char *argv[])
     MU_RUN_SUITE(suite_iseq);
     MU_RUN_SUITE(suite_sum);
     MU_RUN_SUITE(suite_sub);
+    MU_RUN_SUITE(suite_mul);
 
     MU_REPORT();
 
