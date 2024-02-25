@@ -20,6 +20,7 @@ bool bigint_normalize(BigInt *x);
 BigInt *bigint_copy(const BigInt *x);
 
 bool bigint_isless(const BigInt *a, const BigInt *b);
+bool bigint_iseq(const BigInt *a, const BigInt *b);
 
 BigInt *strtobi(char *str);
 char *bitostr(const BigInt *x);

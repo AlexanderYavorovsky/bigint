@@ -291,6 +291,35 @@ MU_TEST_SUITE(suite_normalize)
     MU_RUN_TEST(test_normalize_negzeros);
 }
 
+MU_TEST(test_iseq_reflection)
+{
+    BigInt *x = strtobi("13");
+    BigInt *negx = strtobi("-13");
+
+    mu_check(bigint_iseq(x, x));
+    mu_check(bigint_iseq(negx, negx));
+
+    bigint_free(x);
+    bigint_free(negx);
+}
+
+MU_TEST(test_iseq_sign)
+{
+    BigInt *x = strtobi("13");
+    BigInt *negx = strtobi("-13");
+
+    mu_check(!bigint_iseq(x, negx));
+
+    bigint_free(x);
+    bigint_free(negx);
+}
+
+MU_TEST_SUITE(suite_iseq)
+{
+    MU_RUN_TEST(test_iseq_reflection);
+    MU_RUN_TEST(test_iseq_sign);
+}
+
 int main(int argc, char *argv[])
 {
     MU_RUN_SUITE(suite_init);
@@ -298,6 +327,8 @@ int main(int argc, char *argv[])
     MU_RUN_SUITE(suite_isless);
     MU_RUN_SUITE(suite_iszero);
     MU_RUN_SUITE(suite_normalize);
+    MU_RUN_SUITE(suite_iseq);
+
 	MU_REPORT();
 
 	return MU_EXIT_CODE;
