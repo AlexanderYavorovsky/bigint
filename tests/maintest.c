@@ -320,6 +320,75 @@ MU_TEST_SUITE(suite_iseq)
     MU_RUN_TEST(test_iseq_sign);
 }
 
+MU_TEST(test_sum10_zero)
+{
+    BigInt *zero = strtobi("0");
+    BigInt *x = strtobi("123");
+    BigInt *xneg = strtobi("-123");
+    uint8_t base = 10;
+    BigInt *sum_left = bigint_sum(zero, x, base);
+    BigInt *sum_right = bigint_sum(x, zero, base);
+    BigInt *sum_neg_left = bigint_sum(zero, xneg, base);
+    BigInt *sum_neg_right = bigint_sum(xneg, zero, base);
+
+    mu_check(bigint_iseq(x, sum_left));
+    mu_check(bigint_iseq(x, sum_right));
+
+    mu_check(bigint_iseq(xneg, sum_neg_left));
+    mu_check(bigint_iseq(xneg, sum_neg_right));
+
+    bigint_free(zero);
+    bigint_free(x);
+    bigint_free(xneg);
+    bigint_free(sum_left);
+    bigint_free(sum_right);
+    bigint_free(sum_neg_left);
+    bigint_free(sum_neg_right);
+}
+
+MU_TEST(test_sum10_pospos)
+{
+    BigInt *a = strtobi("999");
+    BigInt *b = strtobi("123");
+    uint8_t base = 10;
+    BigInt *sum_left = bigint_sum(a, b, base);
+    BigInt *sum_right = bigint_sum(b, a, base);
+    BigInt *actual = strtobi("1122");
+
+    mu_check(bigint_iseq(sum_left, sum_right));
+    mu_check(bigint_iseq(actual, sum_left));
+    mu_check(bigint_iseq(actual, sum_right));
+
+    bigint_free(a);
+    bigint_free(b);
+    bigint_free(sum_left);
+    bigint_free(sum_right);
+    bigint_free(actual);
+}
+
+MU_TEST(test_sum10_negpos)
+{
+    BigInt *a = strtobi("-341");
+    BigInt *b = strtobi("283");
+    uint8_t base = 10;
+    BigInt *sum = bigint_sum(a, b, base);
+    BigInt *actual = strtobi("-58");
+
+    mu_check(bigint_iseq(actual, sum));
+
+    bigint_free(a);
+    bigint_free(b);
+    bigint_free(sum);
+    bigint_free(actual);
+}
+
+MU_TEST_SUITE(suite_sum)
+{
+    MU_RUN_TEST(test_sum10_zero);
+    MU_RUN_TEST(test_sum10_pospos);
+    MU_RUN_TEST(test_sum10_negpos); 
+}
+
 int main(int argc, char *argv[])
 {
     MU_RUN_SUITE(suite_init);
@@ -328,6 +397,7 @@ int main(int argc, char *argv[])
     MU_RUN_SUITE(suite_iszero);
     MU_RUN_SUITE(suite_normalize);
     MU_RUN_SUITE(suite_iseq);
+    MU_RUN_SUITE(suite_sum);
 
 	MU_REPORT();
 
