@@ -151,10 +151,153 @@ MU_TEST_SUITE(suite_str)
     MU_RUN_TEST(test_str_big);
 }
 
+MU_TEST(test_isless_0_0)
+{
+    BigInt *a = strtobi("0");
+    BigInt *b = strtobi("0");
+
+    mu_check(!bigint_isless(a, b));
+
+    bigint_free(a);
+    bigint_free(b);
+}
+
+MU_TEST(test_isless_pos_0)
+{
+    BigInt *a = strtobi("124");
+    BigInt *b = strtobi("0");
+
+    mu_check(!bigint_isless(a, b));
+
+    bigint_free(a);
+    bigint_free(b);
+}
+
+MU_TEST(test_isless_pos_pos)
+{
+    BigInt *a = strtobi("124");
+    BigInt *b = strtobi("125");
+
+    mu_check(bigint_isless(a, b));
+
+    bigint_free(a);
+    bigint_free(b);
+}
+
+MU_TEST(test_isless_neg_neg)
+{
+    BigInt *a = strtobi("-124");
+    BigInt *b = strtobi("-224");
+
+    mu_check(!bigint_isless(a, b));
+
+    bigint_free(a);
+    bigint_free(b);
+}
+
+MU_TEST_SUITE(suite_isless)
+{
+    MU_RUN_TEST(test_isless_0_0);
+    MU_RUN_TEST(test_isless_pos_0);
+    MU_RUN_TEST(test_isless_pos_pos);
+    MU_RUN_TEST(test_isless_neg_neg);
+}
+
+MU_TEST(test_iszero_0)
+{
+    BigInt *x = strtobi("0");
+
+    mu_check(bigint_iszero(x));
+
+    bigint_free(x);
+}
+
+MU_TEST(test_iszero_pos)
+{
+    BigInt *x = strtobi("10");
+
+    mu_check(!bigint_iszero(x));
+
+    bigint_free(x);
+}
+
+MU_TEST_SUITE(suite_iszero)
+{
+    MU_RUN_TEST(test_iszero_0);
+    MU_RUN_TEST(test_iszero_pos);
+}
+
+MU_TEST(test_normalize_pos)
+{
+    BigInt *x = strtobi("000123");
+    char *sx;
+
+    bigint_normalize(x);
+    sx = bitostr(x);
+
+    mu_assert_string_eq("123", sx);
+
+    bigint_free(x);
+    free(sx);
+}
+
+MU_TEST(test_normalize_neg)
+{
+    BigInt *x = strtobi("-000123");
+    char *sx;
+
+    bigint_normalize(x);
+    sx = bitostr(x);
+
+    mu_assert_string_eq("-123", sx);
+
+    bigint_free(x);
+    free(sx);
+}
+
+MU_TEST(test_normalize_plus)
+{
+    BigInt *x = strtobi("+000123");
+    char *sx;
+
+    bigint_normalize(x);
+    sx = bitostr(x);
+
+    mu_assert_string_eq("123", sx);
+
+    bigint_free(x);
+    free(sx);
+}
+
+MU_TEST(test_normalize_negzeros)
+{
+    BigInt *x = strtobi("-0000000");
+    char *sx;
+
+    bigint_normalize(x);
+    sx = bitostr(x);
+
+    mu_assert_string_eq("0", sx);
+
+    bigint_free(x);
+    free(sx);
+}
+
+MU_TEST_SUITE(suite_normalize)
+{
+    MU_RUN_TEST(test_normalize_pos);
+    MU_RUN_TEST(test_normalize_neg);
+    MU_RUN_TEST(test_normalize_plus);
+    MU_RUN_TEST(test_normalize_negzeros);
+}
+
 int main(int argc, char *argv[])
 {
     MU_RUN_SUITE(suite_init);
     MU_RUN_SUITE(suite_str);
+    MU_RUN_SUITE(suite_isless);
+    MU_RUN_SUITE(suite_iszero);
+    MU_RUN_SUITE(suite_normalize);
 	MU_REPORT();
 
 	return MU_EXIT_CODE;
