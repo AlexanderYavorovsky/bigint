@@ -15,7 +15,7 @@ bool bigint_free(BigInt *x)
         }
         free(x);
     }
-    
+
     return 0;
 }
 
@@ -107,7 +107,12 @@ bool bigint_normalize(BigInt *x)
 
     newlen = cnt + 1;
 
-    return bigint_resize(x, newlen);
+    bigint_resize(x, newlen);
+
+    if (x->len == 1 && x->digits[0] == 0)
+        x->sign = 1;
+
+    return 0;
 }
 
 BigInt *bigint_copy(const BigInt *x)
@@ -197,6 +202,8 @@ BigInt *strtobi(char *str)
     {
         x->digits[i] = str[len - i - 1] - '0';
     }
+
+    bigint_normalize(x);
     
     return x;
 }
