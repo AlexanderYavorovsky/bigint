@@ -496,7 +496,7 @@ BigInt *bigint_factorial(const BigInt *a, uint8_t base)
     BigInt *one;
     BigInt *top_bound;
 
-    if (a == NULL || base < 2 || base > 10)
+    if (a == NULL || a->sign != 1 || base < 2 || base > 10)
         return NULL;
 
     res = strtobi("1");
