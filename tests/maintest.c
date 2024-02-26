@@ -489,11 +489,26 @@ MU_TEST(test_mul10_negpos)
     bigint_free(mul);
 }
 
+MU_TEST(test_mul10_factorial)
+{
+    BigInt *x = strtobi("100");
+    uint8_t base = 10;
+    BigInt *factorial = bigint_factorial(x, base);
+    BigInt *actual = strtobi("93326215443944152681699238856266700490715968264381621468592963895217599993229915608941463976156518286253697920827223758251185210916864000000000000000000000000");
+
+    mu_check(bigint_iseq(actual, factorial));
+
+    bigint_free(x);
+    bigint_free(factorial);
+    bigint_free(actual);
+}
+
 MU_TEST_SUITE(suite_mul)
 {
     MU_RUN_TEST(test_mul10_zero);
     MU_RUN_TEST(test_mul10_one);
     MU_RUN_TEST(test_mul10_negpos);
+    MU_RUN_TEST(test_mul10_factorial);
 }
 
 int main(int argc, char *argv[])

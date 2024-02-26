@@ -29,5 +29,6 @@ BigInt *bigint_sum(const BigInt *a, const BigInt *b, uint8_t base);
 BigInt *bigint_subtract(const BigInt *a, const BigInt *b, uint8_t base);
 BigInt *_multiply_digit(const BigInt *a, uint8_t digit, uint8_t base, size_t offset);
 BigInt *bigint_multiply(const BigInt *a, const BigInt *b, uint8_t base);
+BigInt *bigint_factorial(const BigInt *a, uint8_t base);
 BigInt *bigint_divide(const BigInt *a, const BigInt *b);
 BigInt *bigint_mod(const BigInt *a, const BigInt *b);

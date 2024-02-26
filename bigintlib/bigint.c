@@ -488,3 +488,49 @@ BigInt *bigint_multiply(const BigInt *a, const BigInt *b, uint8_t base)
 
     return x;
 }
+
+BigInt *bigint_factorial(const BigInt *a, uint8_t base)
+{
+    BigInt *res;
+    BigInt *mul;
+    BigInt *one;
+    BigInt *top_bound;
+
+    if (a == NULL || base < 2 || base > 10)
+        return NULL;
+
+    res = strtobi("1");
+    mul = strtobi("2");
+    one = strtobi("1");
+    top_bound = bigint_sum(a, one, base);
+
+    if (res == NULL || mul == NULL || one == NULL || top_bound == NULL)
+    {
+        bigint_free(res), bigint_free(mul), bigint_free(one), bigint_free(top_bound);
+        return NULL;
+    }
+
+    while (bigint_isless(mul, top_bound))
+    {
+        BigInt *old_res = res;
+        BigInt *old_mul = mul;
+
+        res = bigint_multiply(res, mul, base);
+        mul = bigint_sum(mul, one, base);
+
+        bigint_free(old_res);
+        bigint_free(old_mul);
+
+        if (res == NULL || mul == NULL)
+        {
+            bigint_free(res), bigint_free(mul), bigint_free(one), bigint_free(top_bound);
+            return NULL;
+        }
+    }
+
+    bigint_free(mul);
+    bigint_free(one);
+    bigint_free(top_bound);
+
+    return res;
+}
