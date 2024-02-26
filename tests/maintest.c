@@ -503,12 +503,39 @@ MU_TEST(test_mul10_factorial)
     bigint_free(actual);
 }
 
+MU_TEST(test_mul10_factorialzero)
+{
+    BigInt *zero = strtobi("0");
+    uint8_t base = 10;
+    BigInt *factorial = bigint_factorial(zero, base);
+    BigInt *one = strtobi("1");
+
+    mu_check(bigint_iseq(one, factorial));
+
+    bigint_free(zero);
+    bigint_free(factorial);
+    bigint_free(one);
+}
+
+MU_TEST(test_mul10_factorialneg)
+{
+    BigInt *neg = strtobi("-124");
+    uint8_t base = 10;
+    BigInt *factorial = bigint_factorial(neg, base);
+
+    mu_check(factorial == NULL);
+
+    bigint_free(neg);
+}
+
 MU_TEST_SUITE(suite_mul)
 {
     MU_RUN_TEST(test_mul10_zero);
     MU_RUN_TEST(test_mul10_one);
     MU_RUN_TEST(test_mul10_negpos);
     MU_RUN_TEST(test_mul10_factorial);
+    MU_RUN_TEST(test_mul10_factorialzero);
+    MU_RUN_TEST(test_mul10_factorialneg);
 }
 
 int main(int argc, char *argv[])
