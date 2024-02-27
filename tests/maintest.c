@@ -538,6 +538,100 @@ MU_TEST_SUITE(suite_mul)
     MU_RUN_TEST(test_mul10_factorialneg);
 }
 
+MU_TEST(test_add10)
+{
+    BigInt *a = strtobi("40");
+    BigInt *b = strtobi("234");
+    uint8_t base = 10;
+    BigInt *actual = strtobi("274");
+
+    bigint_add(&a, b, base);
+    mu_check(bigint_iseq(a, actual));
+
+    bigint_free(a);
+    bigint_free(b);
+    bigint_free(actual);
+}
+
+MU_TEST(test_sub10)
+{
+    BigInt *a = strtobi("40");
+    BigInt *b = strtobi("234");
+    uint8_t base = 10;
+    BigInt *actual = strtobi("-194");
+
+    bigint_sub(&a, b, base);
+    mu_check(bigint_iseq(a, actual));
+
+    bigint_free(a);
+    bigint_free(b);
+    bigint_free(actual);
+}
+
+MU_TEST(test_mul10)
+{
+    BigInt *a = strtobi("40");
+    BigInt *b = strtobi("234");
+    uint8_t base = 10;
+    BigInt *actual = strtobi("9360");
+
+    bigint_mul(&a, b, base);
+    mu_check(bigint_iseq(a, actual));
+
+    bigint_free(a);
+    bigint_free(b);
+    bigint_free(actual);
+}
+
+MU_TEST(test_postobi)
+{
+    BigInt *x = postobi(49);
+    BigInt *actual = strtobi("49");
+
+    mu_check(bigint_iseq(actual, x));
+
+    bigint_free(x);
+    bigint_free(actual);
+}
+
+MU_TEST(test_adddigit)
+{
+    BigInt *x = strtobi("134");
+    uint8_t digit = 9;
+    uint8_t base = 10;
+    BigInt *actual = strtobi("143");
+
+    bigint_adddigit(&x, digit, base);
+    mu_check(bigint_iseq(actual, x));
+    
+    bigint_free(x);
+    bigint_free(actual);
+}
+
+MU_TEST(test_muldigit)
+{
+    BigInt *x = strtobi("134");
+    uint8_t digit = 9;
+    uint8_t base = 10;
+    BigInt *actual = strtobi("1206");
+
+    bigint_muldigit(&x, digit, base);
+    mu_check(bigint_iseq(actual, x));
+
+    bigint_free(x);
+    bigint_free(actual);
+}
+
+MU_TEST_SUITE(suite_short)
+{
+    MU_RUN_TEST(test_add10);
+    MU_RUN_TEST(test_sub10);
+    MU_RUN_TEST(test_mul10);
+    MU_RUN_TEST(test_postobi);
+    MU_RUN_TEST(test_adddigit);
+    MU_RUN_TEST(test_muldigit);
+}
+
 int main(int argc, char *argv[])
 {
     MU_RUN_SUITE(suite_init);
@@ -549,6 +643,7 @@ int main(int argc, char *argv[])
     MU_RUN_SUITE(suite_sum);
     MU_RUN_SUITE(suite_sub);
     MU_RUN_SUITE(suite_mul);
+    MU_RUN_SUITE(suite_short);
 
     MU_REPORT();
 
