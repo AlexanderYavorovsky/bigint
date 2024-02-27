@@ -421,10 +421,8 @@ BigInt *bigint_multiply(const BigInt *a, const BigInt *b, uint8_t base)
             continue;
 
         BigInt *prod = _multiply_digit(a, b->digits[i], base, i);
-        BigInt *tmp = x;
+        bigint_add(&x, prod, base);
 
-        x = bigint_sum(x, prod, base);
-        bigint_free(tmp);
         bigint_free(prod);
     }
 
@@ -456,14 +454,8 @@ BigInt *bigint_factorial(const BigInt *a, uint8_t base)
 
     while (bigint_isless(mul, top_bound))
     {
-        BigInt *old_res = res;
-        BigInt *old_mul = mul;
-
-        res = bigint_multiply(res, mul, base);
-        mul = bigint_sum(mul, one, base);
-
-        bigint_free(old_res);
-        bigint_free(old_mul);
+        bigint_mul(&res, mul, base);
+        bigint_adddigit(&mul, 1, base);
 
         if (res == NULL || mul == NULL)
         {
