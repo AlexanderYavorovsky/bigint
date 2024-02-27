@@ -534,3 +534,114 @@ BigInt *bigint_factorial(const BigInt *a, uint8_t base)
 
     return res;
 }
+
+bool bigint_add(BigInt **a, const BigInt *b, uint8_t base)
+{
+    BigInt *old;
+
+    if (*a == NULL || b == NULL || base < 2 || base > 10)
+        return 1;
+
+    old = *a;
+    *a = bigint_sum(*a, b, base);
+
+    bigint_free(old);
+
+    return 0;
+}
+
+bool bigint_sub(BigInt **a, const BigInt *b, uint8_t base)
+{
+    BigInt *old;
+
+    if (*a == NULL || b == NULL || base < 2 || base > 10)
+        return 1;
+
+    old = *a;
+    *a = bigint_subtract(*a, b, base);
+
+    bigint_free(old);
+
+    return 0;
+}
+
+bool bigint_mul(BigInt **a, const BigInt *b, uint8_t base)
+{
+    BigInt *old;
+
+    if (*a == NULL || b == NULL || base < 2 || base > 10)
+        return 1;
+
+    old = *a;
+    *a = bigint_multiply(*a, b, base);
+
+    bigint_free(old);
+
+    return 0;
+}
+
+size_t poslen(uint8_t n)
+{
+    size_t len = 0;
+
+    while (n > 0)
+    {
+        n /= 10;
+        len++;
+    }
+
+    return len;
+}
+
+BigInt *postobi(uint8_t n)
+{
+    BigInt *x;
+    size_t len = poslen(n);
+    size_t cnt = 0;
+
+    x = bigint_init_n(len);
+    if (x == NULL)
+        return NULL;
+
+    while (n > 0)
+    {
+        x->digits[cnt++] = n % 10;
+        n /= 10;
+    }
+
+    return x;
+}
+
+bool bigint_adddigit(BigInt **a, uint8_t digit, uint8_t base)
+{
+    BigInt *bigdigit;
+
+    if (*a == NULL || digit >= base || base < 2 || base > 10)
+        return 1;
+
+    bigdigit = postobi(digit);
+    if (bigdigit == NULL)
+        return 1;
+
+    bigint_add(a, bigdigit, base);
+    bigint_free(bigdigit);
+
+    return 0;
+}
+
+bool bigint_muldigit(BigInt **a, uint8_t digit, uint8_t base)
+{
+    BigInt *bigdigit;
+
+    if (*a == NULL || base < 2 || base > 10)
+        return 1;
+
+    bigdigit = postobi(digit);
+    if (bigdigit == NULL)
+        return 1;
+
+    bigint_mul(a, bigdigit, base);
+    bigint_free(bigdigit);
+
+    return 0;
+}
