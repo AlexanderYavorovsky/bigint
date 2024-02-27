@@ -806,6 +806,61 @@ MU_TEST_SUITE(suite_div)
     MU_RUN_TEST(test_div10_pospos_reswith0);
 }
 
+MU_TEST(test_mod_pospos)
+{
+    BigInt *a = strtobi("1242");
+    BigInt *b = strtobi("54");
+    uint8_t base = 10;
+    BigInt *r = bigint_mod(a, b, base);
+
+    mu_check(bigint_iszero(r));
+
+    bigint_free(a);
+    bigint_free(b);
+    bigint_free(r);
+}
+
+MU_TEST(test_mod_pospos_remain)
+{
+    BigInt *a = strtobi("11471");
+    BigInt *b = strtobi("473");
+    uint8_t base = 10;
+    BigInt *r = bigint_mod(a, b, base);
+    BigInt *actual = strtobi("119");
+
+    mu_check(bigint_iseq(actual, r));
+
+    bigint_free(a);
+    bigint_free(b);
+    bigint_free(r);
+    bigint_free(actual);
+}
+
+MU_TEST(test_mod_negpos_remain)
+{
+    BigInt *a = strtobi("-24781");
+    BigInt *b = strtobi("234");
+    uint8_t base = 10;
+    BigInt *q = bigint_divide(a, b, base);
+    BigInt *r = bigint_mod(a, b, base);
+    BigInt *actual = strtobi("23");
+
+    mu_check(bigint_iseq(actual, r));
+
+    bigint_free(a);
+    bigint_free(b);
+    bigint_free(r);
+    bigint_free(q);
+    bigint_free(actual);
+}
+
+MU_TEST_SUITE(suite_mod)
+{
+    MU_RUN_TEST(test_mod_pospos);
+    MU_RUN_TEST(test_mod_pospos_remain);
+    MU_RUN_TEST(test_mod_negpos_remain);
+}
+
 int main(int argc, char *argv[])
 {
     MU_RUN_SUITE(suite_init);
@@ -819,6 +874,7 @@ int main(int argc, char *argv[])
     MU_RUN_SUITE(suite_mul);
     MU_RUN_SUITE(suite_short);
     MU_RUN_SUITE(suite_div);
+    MU_RUN_SUITE(suite_mod);
 
     MU_REPORT();
 
