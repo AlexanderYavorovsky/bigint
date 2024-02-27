@@ -580,7 +580,7 @@ bool bigint_mul(BigInt **a, const BigInt *b, uint8_t base)
     return 0;
 }
 
-size_t poslen(uint8_t n)
+size_t _poslen(uint8_t n)
 {
     size_t len = 0;
 
@@ -593,10 +593,10 @@ size_t poslen(uint8_t n)
     return len;
 }
 
-BigInt *postobi(uint8_t n)
+BigInt *_postobi(uint8_t n)
 {
     BigInt *x;
-    size_t len = poslen(n);
+    size_t len = _poslen(n);
     size_t cnt = 0;
 
     x = bigint_init_n(len);
@@ -619,7 +619,7 @@ bool bigint_adddigit(BigInt **a, uint8_t digit, uint8_t base)
     if (*a == NULL || digit >= base || base < 2 || base > 10)
         return 1;
 
-    bigdigit = postobi(digit);
+    bigdigit = _postobi(digit);
     if (bigdigit == NULL)
         return 1;
 
@@ -636,7 +636,7 @@ bool bigint_muldigit(BigInt **a, uint8_t digit, uint8_t base)
     if (*a == NULL || base < 2 || base > 10)
         return 1;
 
-    bigdigit = postobi(digit);
+    bigdigit = _postobi(digit);
     if (bigdigit == NULL)
         return 1;
 

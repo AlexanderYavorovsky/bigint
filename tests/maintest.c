@@ -585,7 +585,7 @@ MU_TEST(test_mul10)
 
 MU_TEST(test_postobi)
 {
-    BigInt *x = postobi(49);
+    BigInt *x = _postobi(49);
     BigInt *actual = strtobi("49");
 
     mu_check(bigint_iseq(actual, x));
