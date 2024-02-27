@@ -39,3 +39,6 @@ size_t poslen(uint8_t n);
 BigInt *postobi(uint8_t n);
 bool bigint_adddigit(BigInt **a, uint8_t digit, uint8_t base);
 bool bigint_muldigit(BigInt **a, uint8_t digit, uint8_t base);
+
+bool bigint_swap(BigInt **a, BigInt **b);
+BigInt *bigint_gcd(const BigInt *a, const BigInt *b);

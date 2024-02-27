@@ -648,7 +648,7 @@ bool bigint_muldigit(BigInt **a, uint8_t digit, uint8_t base)
 
 BigInt *bigint_divide(const BigInt *a, const BigInt *b, uint8_t base)
 {
-    BigInt *q, *cur, *posb;
+    BigInt *q, *cur, *bpos;
     size_t cnt;
     bool flag = 0;
     bool was_division = 0;
@@ -656,8 +656,8 @@ BigInt *bigint_divide(const BigInt *a, const BigInt *b, uint8_t base)
     if (a == NULL || b == NULL || bigint_iszero(b) || base < 2 || base > 10)
         return NULL;
 
-    posb = bigint_copy(b);
-    posb->sign = 1;
+    bpos = bigint_copy(b);
+    bpos->sign = 1;
 
     cnt = a->len - 1;
     q = strtobi("0");
@@ -667,7 +667,7 @@ BigInt *bigint_divide(const BigInt *a, const BigInt *b, uint8_t base)
     {
         uint8_t divcnt = 0;
 
-        while (!flag && bigint_isless(cur, posb))
+        while (!flag && bigint_isless(cur, bpos))
         {
             uint8_t digit;
 
@@ -682,9 +682,9 @@ BigInt *bigint_divide(const BigInt *a, const BigInt *b, uint8_t base)
                 bigint_muldigit(&q, 10, base);
         }
 
-        while (bigint_isless(posb, cur) || bigint_iseq(posb, cur))
+        while (bigint_isless(bpos, cur) || bigint_iseq(bpos, cur))
         {
-            bigint_sub(&cur, posb, base);
+            bigint_sub(&cur, bpos, base);
             divcnt++;
         }
 
@@ -698,7 +698,7 @@ BigInt *bigint_divide(const BigInt *a, const BigInt *b, uint8_t base)
     q->sign = a->sign * b->sign;
 
     bigint_free(cur);
-    bigint_free(posb);
+    bigint_free(bpos);
 
     return q;
 }
@@ -727,4 +727,48 @@ BigInt *bigint_mod(const BigInt *a, const BigInt *b, uint8_t base)
     bigint_free(bq);
 
     return r;
+}
+
+bool bigint_swap(BigInt **a, BigInt **b)
+{
+    BigInt *tmp;
+
+    tmp = *a;
+    *a = *b;
+    *b = tmp;
+
+    return 0;
+}
+
+/* base = 10 only? */
+BigInt *bigint_gcd(const BigInt *a, const BigInt *b)
+{
+    BigInt *apos, *bpos;
+
+    if (a == NULL || b == NULL || bigint_iszero(a) && bigint_iszero(b))
+        return NULL;
+
+    /* gcd(a, b) = gcd(-a, -b) = gcd(a, -b) = gcd(-a, b) */
+    apos = bigint_copy(a);
+    apos->sign = 1;
+    bpos = bigint_copy(b);
+    bpos->sign = 1;
+
+    /* assume a >= b */
+    if (bigint_isless(apos, bpos))
+        bigint_swap(&apos, &bpos);
+
+    while (!bigint_iszero(bpos))
+    {
+        BigInt *old_apos = apos;
+
+        apos = bpos;
+        bpos = bigint_mod(old_apos, bpos, 10);
+
+        bigint_free(old_apos);
+    }
+
+    bigint_free(bpos);
+
+    return apos;
 }
