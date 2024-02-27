@@ -10,9 +10,7 @@ bool bigint_free(BigInt *x)
     if (x != NULL)
     {
         if (x->digits != NULL)
-        {
             free(x->digits);
-        }
         free(x);
     }
 
@@ -61,9 +59,7 @@ bool bigint_fillzero(BigInt *x, size_t beg, size_t n)
     }
 
     for (size_t i = beg; i < beg + n; i++)
-    {
         x->digits[i] = 0;
-    }
 
     return 0;
 }
@@ -101,9 +97,7 @@ bool bigint_normalize(BigInt *x)
 
     cnt = x->len - 1;
     while (cnt && x->digits[cnt] == 0)
-    {
         cnt--;
-    }
 
     newlen = cnt + 1;
 
@@ -129,9 +123,7 @@ BigInt *bigint_copy(const BigInt *x)
     copy->sign = x->sign;
 
     for (size_t i = 0; i < x->len; i++)
-    {
         copy->digits[i] = x->digits[i];
-    }
 
     return copy;
 }
@@ -170,10 +162,8 @@ bool bigint_iseq(const BigInt *a, const BigInt *b)
         return 0;
 
     for (size_t i = 0; i < a->len; i++)
-    {
         if (a->digits[a->len - i - 1] != b->digits[b->len - i - 1])
             return 0;
-    }
 
     return 1;
 }
@@ -184,10 +174,8 @@ bool bigint_iszero(const BigInt *x)
         return 0;
 
     for (size_t i = 0; i < x->len; i++)
-    {
         if (x->digits[i] != 0)
             return 0;
-    }
 
     return 1;
 }
@@ -205,9 +193,7 @@ BigInt *strtobi(char *str)
         offset = 1;
     }
     else if (str[0] == '+')
-    {
         offset = 1;
-    }
 
     x = bigint_init_n(len - offset);
     if (x == NULL)
@@ -216,9 +202,7 @@ BigInt *strtobi(char *str)
     x->sign = sign;
 
     for (size_t i = 0; i < len - offset; i++)
-    {
         x->digits[i] = str[len - i - 1] - '0';
-    }
 
     bigint_normalize(x);
     
@@ -241,9 +225,7 @@ char *bitostr(const BigInt *x)
     }
 
     for (size_t i = 0; i < x->len; i++)
-    {
         str[i + offset] = x->digits[x->len - i - 1] + '0';
-    }
 
     str[slen - 1] = '\0'; 
 
@@ -267,9 +249,7 @@ BigInt *bigint_sum(const BigInt *a, const BigInt *b, uint8_t base)
         return NULL;
 
     if (bigint_isless(a, b))
-    {
         return bigint_sum(b, a, base);
-    }
     if (b->sign != 1)
     {
         BigInt *tmp = bigint_copy(b);
@@ -300,21 +280,15 @@ BigInt *bigint_sum(const BigInt *a, const BigInt *b, uint8_t base)
             sum %= base;
         }
         else
-        {
             carry = 0;
-        }
 
         x->digits[i] = sum;
     }
 
     if (carry > 0)
-    {
         x->digits[x->len - 1] = carry;
-    }
     else
-    {
         bigint_resize(x, x->len - 1);
-    }
 
     return x;
 }
@@ -373,9 +347,7 @@ BigInt *bigint_subtract(const BigInt *a, const BigInt *b, uint8_t base)
                 diff += base;
         }
         else
-        {
             borrow = 0;
-        }
 
         x->digits[i] = diff;
     }
@@ -412,21 +384,15 @@ BigInt *_multiply_digit(const BigInt *a, uint8_t digit, uint8_t base, size_t off
             prod %= base;
         }
         else
-        {
             carry = 0;
-        }
 
         x->digits[i + offset] = prod;
     }
 
     if (carry > 0)
-    {
         x->digits[x->len - 1] = carry;
-    }
     else
-    {
         bigint_resize(x, x->len - 1);
-    }
 
     return x;
 }
@@ -445,9 +411,7 @@ BigInt *bigint_multiply(const BigInt *a, const BigInt *b, uint8_t base)
         return NULL;
 
     if (bigint_isless(a, b))
-    {
         return bigint_multiply(b, a, base);
-    }
     if (b->sign != 1)
     {
         BigInt *tmp = bigint_copy(b);
