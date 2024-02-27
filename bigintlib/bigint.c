@@ -651,6 +651,7 @@ BigInt *bigint_divide(const BigInt *a, const BigInt *b, uint8_t base)
     BigInt *q, *cur, *posb;
     size_t cnt;
     bool flag = 0;
+    bool was_division = 0;
 
     if (a == NULL || b == NULL || bigint_iszero(b) || base < 2 || base > 10)
         return NULL;
@@ -676,6 +677,9 @@ BigInt *bigint_divide(const BigInt *a, const BigInt *b, uint8_t base)
             digit = a->digits[cnt--];
             bigint_muldigit(&cur, 10, base);
             bigint_adddigit(&cur, digit, base);
+
+            if (was_division)
+                bigint_muldigit(&q, 10, base);
         }
 
         while (bigint_isless(posb, cur) || bigint_iseq(posb, cur))
@@ -684,7 +688,7 @@ BigInt *bigint_divide(const BigInt *a, const BigInt *b, uint8_t base)
             divcnt++;
         }
 
-        bigint_muldigit(&q, 10, base);
+        was_division = 1;
         bigint_adddigit(&q, divcnt, base);
     }
 
