@@ -776,6 +776,22 @@ MU_TEST(test_div10_posneg)
     bigint_free(actual);
 }
 
+MU_TEST(test_div10_pospos_reswith0)
+{
+    BigInt *a = strtobi("24781");
+    BigInt *b = strtobi("234");
+    uint8_t base = 10;
+    BigInt *q = bigint_divide(a, b, base);
+    BigInt *actual = strtobi("105");
+
+    mu_check(bigint_iseq(actual, q));
+
+    bigint_free(a);
+    bigint_free(b);
+    bigint_free(q);
+    bigint_free(actual);
+}
+
 MU_TEST_SUITE(suite_div)
 {
     MU_RUN_TEST(test_div10_self);
@@ -787,6 +803,7 @@ MU_TEST_SUITE(suite_div)
     MU_RUN_TEST(test_div10_negneg_remain);
     MU_RUN_TEST(test_div10_negneg);
     MU_RUN_TEST(test_div10_posneg);
+    MU_RUN_TEST(test_div10_pospos_reswith0);
 }
 
 int main(int argc, char *argv[])
