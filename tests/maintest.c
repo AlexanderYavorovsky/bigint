@@ -861,6 +861,68 @@ MU_TEST_SUITE(suite_mod)
     MU_RUN_TEST(test_mod_negpos_remain);
 }
 
+MU_TEST(test_gcd_pospos)
+{
+    BigInt *a = strtobi("91672");
+    BigInt *b = strtobi("7504");
+    BigInt *gcd = bigint_gcd(a, b);
+    BigInt *actual = strtobi("56");
+
+    mu_check(bigint_iseq(actual, gcd));
+
+    bigint_free(a);
+    bigint_free(b);
+    bigint_free(gcd);
+    bigint_free(actual);
+}
+
+MU_TEST(test_gcd_negneg)
+{
+    BigInt *a = strtobi("-7504");
+    BigInt *b = strtobi("-1341942");
+    BigInt *gcd = bigint_gcd(a, b);
+    BigInt *actual = strtobi("14");
+
+    mu_check(bigint_iseq(actual, gcd));
+
+    bigint_free(a);
+    bigint_free(b);
+    bigint_free(gcd);
+    bigint_free(actual);
+}
+
+MU_TEST(test_gcd_zero)
+{
+    BigInt *a = strtobi("0");
+    BigInt *b = strtobi("123497831145451");
+    BigInt *gcd = bigint_gcd(a, b);
+
+    mu_check(bigint_iseq(b, gcd));
+
+    bigint_free(a);
+    bigint_free(b);
+    bigint_free(gcd);
+}
+
+MU_TEST(test_gcd_self)
+{
+    BigInt *a = strtobi("1985710561205715");
+    BigInt *gcd = bigint_gcd(a, a);
+
+    mu_check(bigint_iseq(a, gcd));
+
+    bigint_free(a);
+    bigint_free(gcd);
+}
+
+MU_TEST_SUITE(suite_gcd)
+{
+    MU_RUN_TEST(test_gcd_pospos);
+    MU_RUN_TEST(test_gcd_negneg);
+    MU_RUN_TEST(test_gcd_zero);
+    MU_RUN_TEST(test_gcd_self);
+}
+
 int main(int argc, char *argv[])
 {
     MU_RUN_SUITE(suite_init);
@@ -875,6 +937,7 @@ int main(int argc, char *argv[])
     MU_RUN_SUITE(suite_short);
     MU_RUN_SUITE(suite_div);
     MU_RUN_SUITE(suite_mod);
+    MU_RUN_SUITE(suite_gcd);
 
     MU_REPORT();
 
