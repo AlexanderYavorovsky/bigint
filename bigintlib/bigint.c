@@ -645,3 +645,56 @@ bool bigint_muldigit(BigInt **a, uint8_t digit, uint8_t base)
 
     return 0;
 }
+
+BigInt *bigint_divide(const BigInt *a, const BigInt *b, uint8_t base)
+{
+    BigInt *q, *cur, *posb;
+    size_t cnt;
+    bool flag = 0;
+
+    if (a == NULL || b == NULL || bigint_iszero(b) || base < 2 || base > 10)
+        return NULL;
+
+    posb = bigint_copy(b);
+    posb->sign = 1;
+
+    cnt = a->len - 1;
+    q = strtobi("0");
+    cur = strtobi("0");
+
+    while (!flag)
+    {
+        uint8_t divcnt = 0;
+
+        while (!flag && bigint_isless(cur, posb))
+        {
+            uint8_t digit;
+
+            if (cnt == 0)
+                flag = 1;
+
+            digit = a->digits[cnt--];
+            bigint_muldigit(&cur, 10, base);
+            bigint_adddigit(&cur, digit, base);
+        }
+
+        while (bigint_isless(posb, cur) || bigint_iseq(posb, cur))
+        {
+            bigint_sub(&cur, posb, base);
+            divcnt++;
+        }
+
+        bigint_muldigit(&q, 10, base);
+        bigint_adddigit(&q, divcnt, base);
+    }
+
+    if (a->sign != 1 && !bigint_iszero(cur))
+        bigint_adddigit(&q, 1, base);
+
+    q->sign = a->sign * b->sign;
+
+    bigint_free(cur);
+    bigint_free(posb);
+
+    return q;
+}
