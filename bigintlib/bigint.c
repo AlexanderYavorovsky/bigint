@@ -702,3 +702,29 @@ BigInt *bigint_divide(const BigInt *a, const BigInt *b, uint8_t base)
 
     return q;
 }
+
+BigInt *bigint_mod(const BigInt *a, const BigInt *b, uint8_t base)
+{
+    BigInt *r, *q, *bq;
+
+    if (a == NULL || b == NULL || bigint_iszero(b) || base < 2 || base > 10)
+        return NULL;
+
+    q = bigint_divide(a, b, base);
+    if (q == NULL)
+        return NULL;
+
+    bq = bigint_multiply(b, q, base);
+    if (bq == NULL)
+    {
+        bigint_free(q);
+        return NULL;
+    }
+
+    r = bigint_subtract(a, bq, base);
+
+    bigint_free(q);
+    bigint_free(bq);
+
+    return r;
+}

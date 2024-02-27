@@ -31,7 +31,7 @@ BigInt *_multiply_digit(const BigInt *a, uint8_t digit, uint8_t base, size_t off
 BigInt *bigint_multiply(const BigInt *a, const BigInt *b, uint8_t base);
 BigInt *bigint_factorial(const BigInt *a, uint8_t base);
 BigInt *bigint_divide(const BigInt *a, const BigInt *b, uint8_t base);
-BigInt *bigint_mod(const BigInt *a, const BigInt *b);
+BigInt *bigint_mod(const BigInt *a, const BigInt *b, uint8_t base);
 bool bigint_add(BigInt **a, const BigInt *b, uint8_t base);
 bool bigint_sub(BigInt **a, const BigInt *b, uint8_t base);
 bool bigint_mul(BigInt **a, const BigInt *b, uint8_t base);
