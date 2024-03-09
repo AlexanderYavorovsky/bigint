@@ -1,15 +1,12 @@
-cmake_minimum_required(VERSION 3.22.1)
+cmake_minimum_required(VERSION 3.1)
 
-project(maintest C)
+project(bigintlib C)
 
 set(SOURCES tests/maintest.c)
-set(SUBDIR bigintlib)
-set(EXENAME maintest)
+set(EXENAME bigint)
 
-add_compile_options(-Wall)
-
-add_subdirectory(${SUBDIR})
+add_subdirectory(bigintlib)
 add_executable(${EXENAME} ${SOURCES})
 
+target_compile_options(${EXENAME} PRIVATE -Wall)
 target_link_libraries(${EXENAME} PUBLIC bigintlib)
-target_include_directories(${EXENAME} PUBLIC ${SUBDIR})
