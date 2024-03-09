@@ -1,7 +1,6 @@
 /* Yavorovsky Alexander, 22.02.2024 */
 
 #include <stdint.h>
-#include <stdbool.h>
 
 typedef struct 
 {
@@ -11,20 +10,20 @@ typedef struct
 } BigInt;
 
 /* free memory allocated for x */
-bool bigint_free(BigInt *x);
+void bigint_free(BigInt *x);
 
 /* returns copy of x */
 BigInt *bigint_copy(const BigInt *x);
 
 /* fill x->digits with zeroes from position beg to position n*/
-bool bigint_fillzero(BigInt *x, size_t beg, size_t n);
+uint8_t bigint_fillzero(BigInt *x, size_t beg, size_t n);
 
 /* returns 1 if a == 0 */
-bool bigint_iszero(const BigInt *x);
+uint8_t bigint_iszero(const BigInt *x);
 /* returns 1 if a < b, 0 otherwise */
-bool bigint_isless(const BigInt *a, const BigInt *b);
+uint8_t bigint_isless(const BigInt *a, const BigInt *b);
 /* returns 1 if a == b */
-bool bigint_iseq(const BigInt *a, const BigInt *b);
+uint8_t bigint_iseq(const BigInt *a, const BigInt *b);
 
 /* make BigInt from string */
 BigInt *strtobi(char *str);
@@ -47,18 +46,18 @@ BigInt *bigint_divide(const BigInt *a, const BigInt *b, uint8_t base);
 BigInt *bigint_mod(const BigInt *a, const BigInt *b, uint8_t base);
 
 /* a += b */
-bool bigint_add(BigInt **a, const BigInt *b, uint8_t base);
+uint8_t bigint_add(BigInt **a, const BigInt *b, uint8_t base);
 /* a -= b */
-bool bigint_sub(BigInt **a, const BigInt *b, uint8_t base);
+uint8_t bigint_sub(BigInt **a, const BigInt *b, uint8_t base);
 /* a *= b */
-bool bigint_mul(BigInt **a, const BigInt *b, uint8_t base);
+uint8_t bigint_mul(BigInt **a, const BigInt *b, uint8_t base);
 /* a += digit */
-bool bigint_adddigit(BigInt **a, uint8_t digit, uint8_t base);
+uint8_t bigint_adddigit(BigInt **a, uint8_t digit, uint8_t base);
 /* a*= digit */
-bool bigint_muldigit(BigInt **a, uint8_t digit, uint8_t base);
+uint8_t bigint_muldigit(BigInt **a, uint8_t digit, uint8_t base);
 
 /* a, b = b, a */
-bool bigint_swap(BigInt **a, BigInt **b);
+uint8_t bigint_swap(BigInt **a, BigInt **b);
 
 /* returns the greates common divisor of a and b with base = 10 */
 BigInt *bigint_gcd(const BigInt *a, const BigInt *b);
