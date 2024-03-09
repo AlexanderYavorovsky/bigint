@@ -17,19 +17,9 @@ bool bigint_free(BigInt *x)
     return 0;
 }
 
-BigInt *bigint_init(void)
+static BigInt *bigint_init_n(size_t len)
 {
-    BigInt *x = malloc(sizeof(BigInt));
-
-    if (x == NULL)
-        return NULL;
-
-    return x;
-}
-
-BigInt *bigint_init_n(size_t len)
-{
-    BigInt *x = bigint_init();
+    BigInt *x = malloc(sizeof(*x));
     if(x == NULL)
         return NULL;
     
@@ -64,7 +54,7 @@ bool bigint_fillzero(BigInt *x, size_t beg, size_t n)
     return 0;
 }
 
-bool bigint_resize(BigInt *x, size_t newlen)
+static bool bigint_resize(BigInt *x, size_t newlen)
 {
     uint8_t *tmp;
     size_t oldlen;
@@ -88,7 +78,7 @@ bool bigint_resize(BigInt *x, size_t newlen)
 }
 
 
-bool bigint_normalize(BigInt *x)
+static bool bigint_normalize(BigInt *x)
 {
     size_t cnt, newlen;
 
@@ -128,6 +118,11 @@ BigInt *bigint_copy(const BigInt *x)
     return copy;
 }
 
+bool bigint_iszero(const BigInt *x)
+{
+    return x->len == 1 && x->digits[0] == 0;
+}
+
 bool bigint_isless(const BigInt *a, const BigInt *b)
 {
     if (a == NULL || b == NULL)
@@ -163,18 +158,6 @@ bool bigint_iseq(const BigInt *a, const BigInt *b)
 
     for (size_t i = 0; i < a->len; i++)
         if (a->digits[a->len - i - 1] != b->digits[b->len - i - 1])
-            return 0;
-
-    return 1;
-}
-
-bool bigint_iszero(const BigInt *x)
-{
-    if (x == NULL || x->digits == NULL)
-        return 0;
-
-    for (size_t i = 0; i < x->len; i++)
-        if (x->digits[i] != 0)
             return 0;
 
     return 1;
@@ -230,6 +213,38 @@ char *bitostr(const BigInt *x)
     str[slen - 1] = '\0'; 
 
     return str;
+}
+
+size_t _poslen(uint8_t n)
+{
+    size_t len = 0;
+
+    while (n > 0)
+    {
+        n /= 10;
+        len++;
+    }
+
+    return len;
+}
+
+BigInt *postobi(uint8_t n)
+{
+    BigInt *x;
+    size_t len = _poslen(n);
+    size_t cnt = 0;
+
+    x = bigint_init_n(len);
+    if (x == NULL)
+        return NULL;
+
+    while (n > 0)
+    {
+        x->digits[cnt++] = n % 10;
+        n /= 10;
+    }
+
+    return x;
 }
 
 /* restriction: 2 <= base <= 10 */
@@ -345,7 +360,7 @@ BigInt *bigint_subtract(const BigInt *a, const BigInt *b, uint8_t base)
     return x;
 }
 
-BigInt *_multiply_digit(const BigInt *a, uint8_t digit, uint8_t base, size_t offset)
+static BigInt *_multiply_digit(const BigInt *a, uint8_t digit, uint8_t base, size_t offset)
 {
     BigInt *x;
     uint8_t prod = 0;
@@ -516,38 +531,6 @@ bool bigint_mul(BigInt **a, const BigInt *b, uint8_t base)
     return 0;
 }
 
-size_t _poslen(uint8_t n)
-{
-    size_t len = 0;
-
-    while (n > 0)
-    {
-        n /= 10;
-        len++;
-    }
-
-    return len;
-}
-
-BigInt *_postobi(uint8_t n)
-{
-    BigInt *x;
-    size_t len = _poslen(n);
-    size_t cnt = 0;
-
-    x = bigint_init_n(len);
-    if (x == NULL)
-        return NULL;
-
-    while (n > 0)
-    {
-        x->digits[cnt++] = n % 10;
-        n /= 10;
-    }
-
-    return x;
-}
-
 bool bigint_adddigit(BigInt **a, uint8_t digit, uint8_t base)
 {
     BigInt *bigdigit;
@@ -555,7 +538,7 @@ bool bigint_adddigit(BigInt **a, uint8_t digit, uint8_t base)
     if (*a == NULL || digit >= base || base < 2 || base > 10)
         return 1;
 
-    bigdigit = _postobi(digit);
+    bigdigit = postobi(digit);
     if (bigdigit == NULL)
         return 1;
 
@@ -572,7 +555,7 @@ bool bigint_muldigit(BigInt **a, uint8_t digit, uint8_t base)
     if (*a == NULL || base < 2 || base > 10)
         return 1;
 
-    bigdigit = _postobi(digit);
+    bigdigit = postobi(digit);
     if (bigdigit == NULL)
         return 1;
 

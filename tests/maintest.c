@@ -7,34 +7,6 @@
 #include "bigint.h"
 #include "minunit.h"
 
-MU_TEST(test_init_max)
-{
-    size_t len = UINT_MAX;
-    BigInt *x = bigint_init_n(len);
-
-    mu_check(x != NULL);
-    mu_check(x->len == len);
-
-    bigint_free(x);
-}
-
-MU_TEST(test_init_min)
-{
-    size_t len = 1;
-    BigInt *x = bigint_init_n(len);
-
-    mu_check(x != NULL);
-    mu_check(x->len == len);
-
-    bigint_free(x);
-}
-
-MU_TEST_SUITE(suite_init)
-{
-    MU_RUN_TEST(test_init_max);
-    MU_RUN_TEST(test_init_min);
-}
-
 MU_TEST(test_str_pos)
 {
     char str[] = "1234567890";
@@ -224,70 +196,6 @@ MU_TEST_SUITE(suite_iszero)
 {
     MU_RUN_TEST(test_iszero_0);
     MU_RUN_TEST(test_iszero_pos);
-}
-
-MU_TEST(test_normalize_pos)
-{
-    BigInt *x = strtobi("000123");
-    char *sx;
-
-    bigint_normalize(x);
-    sx = bitostr(x);
-
-    mu_assert_string_eq("123", sx);
-
-    bigint_free(x);
-    free(sx);
-}
-
-MU_TEST(test_normalize_neg)
-{
-    BigInt *x = strtobi("-000123");
-    char *sx;
-
-    bigint_normalize(x);
-    sx = bitostr(x);
-
-    mu_assert_string_eq("-123", sx);
-
-    bigint_free(x);
-    free(sx);
-}
-
-MU_TEST(test_normalize_plus)
-{
-    BigInt *x = strtobi("+000123");
-    char *sx;
-
-    bigint_normalize(x);
-    sx = bitostr(x);
-
-    mu_assert_string_eq("123", sx);
-
-    bigint_free(x);
-    free(sx);
-}
-
-MU_TEST(test_normalize_negzeros)
-{
-    BigInt *x = strtobi("-0000000");
-    char *sx;
-
-    bigint_normalize(x);
-    sx = bitostr(x);
-
-    mu_assert_string_eq("0", sx);
-
-    bigint_free(x);
-    free(sx);
-}
-
-MU_TEST_SUITE(suite_normalize)
-{
-    MU_RUN_TEST(test_normalize_pos);
-    MU_RUN_TEST(test_normalize_neg);
-    MU_RUN_TEST(test_normalize_plus);
-    MU_RUN_TEST(test_normalize_negzeros);
 }
 
 MU_TEST(test_iseq_reflection)
@@ -585,7 +493,7 @@ MU_TEST(test_mul10)
 
 MU_TEST(test_postobi)
 {
-    BigInt *x = _postobi(49);
+    BigInt *x = postobi(49);
     BigInt *actual = strtobi("49");
 
     mu_check(bigint_iseq(actual, x));
@@ -925,11 +833,9 @@ MU_TEST_SUITE(suite_gcd)
 
 int main(int argc, char *argv[])
 {
-    MU_RUN_SUITE(suite_init);
     MU_RUN_SUITE(suite_str);
     MU_RUN_SUITE(suite_isless);
     MU_RUN_SUITE(suite_iszero);
-    MU_RUN_SUITE(suite_normalize);
     MU_RUN_SUITE(suite_iseq);
     MU_RUN_SUITE(suite_sum);
     MU_RUN_SUITE(suite_sub);

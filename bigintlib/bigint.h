@@ -10,20 +10,14 @@ typedef struct
     size_t len;
 } BigInt;
 
+/* free memory allocated for x */
 bool bigint_free(BigInt *x);
-BigInt *bigint_init(void);
 
-/* initialize BigInt with the given length */
-BigInt *bigint_init_n(size_t len);
 /* returns copy of x */
 BigInt *bigint_copy(const BigInt *x);
 
 /* fill x->digits with zeroes from position beg to position n*/
 bool bigint_fillzero(BigInt *x, size_t beg, size_t n);
-/* change x size */
-bool bigint_resize(BigInt *x, size_t newlen);
-/* remove zeroes in the beginning of x, change length if necessary */
-bool bigint_normalize(BigInt *x);
 
 /* returns 1 if a == 0 */
 bool bigint_iszero(const BigInt *x);
@@ -36,17 +30,13 @@ bool bigint_iseq(const BigInt *a, const BigInt *b);
 BigInt *strtobi(char *str);
 /* make string from BigInt */
 char *bitostr(const BigInt *x);
-/* make BigInt from small positive integer (for internal purposes) */
-BigInt *_postobi(uint8_t n);
-/* returns length of the positive number n (for internal purposes) */
-size_t _poslen(uint8_t n);
+/* make BigInt from small positive integer */
+BigInt *postobi(uint8_t n);
 
 /* a + b */
 BigInt *bigint_sum(const BigInt *a, const BigInt *b, uint8_t base);
 /* a - b */
 BigInt *bigint_subtract(const BigInt *a, const BigInt *b, uint8_t base);
-/* a * digit (for internal purposes) */
-BigInt *_multiply_digit(const BigInt *a, uint8_t digit, uint8_t base, size_t offset);
 /* a * b */
 BigInt *bigint_multiply(const BigInt *a, const BigInt *b, uint8_t base);
 /* a! */
