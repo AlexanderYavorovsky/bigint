@@ -21,7 +21,7 @@ static BigInt *bigint_init_n(size_t len)
     if(x == NULL)
         return NULL;
     
-    x->digits = malloc(len);
+    x->digits = malloc(len * sizeof(x->digits));
     if (x->digits == NULL)
     {
         free(x);
@@ -34,6 +34,23 @@ static BigInt *bigint_init_n(size_t len)
     return x;
 }
 
+BigInt *bigint_copy(const BigInt *x)
+{
+    BigInt *copy;
+
+    if (x == NULL)
+        return NULL;
+
+    copy = bigint_init_n(x->len);
+    if (copy == NULL)
+        return NULL;
+
+    copy->sign = x->sign;
+    memcpy(copy->digits, x->digits, x->len);
+
+    return copy;
+}
+
 uint8_t bigint_fillzero(BigInt *x, size_t beg, size_t n)
 {
     if (x == NULL || beg + n > x->len)
@@ -41,7 +58,7 @@ uint8_t bigint_fillzero(BigInt *x, size_t beg, size_t n)
 
     if (x->digits == NULL)
     {
-        x->digits = malloc(x->len);
+        x->digits = malloc(x->len * sizeof(x->digits));
         if (x->digits == NULL)
             return 0;
     }
@@ -93,23 +110,6 @@ static uint8_t bigint_normalize(BigInt *x)
         x->sign = 1;
 
     return 1;
-}
-
-BigInt *bigint_copy(const BigInt *x)
-{
-    BigInt *copy;
-
-    if (x == NULL)
-        return NULL;
-
-    copy = bigint_init_n(x->len);
-    if (copy == NULL)
-        return NULL;
-
-    copy->sign = x->sign;
-    memcpy(copy->digits, x->digits, x->len);
-
-    return copy;
 }
 
 uint8_t bigint_iszero(const BigInt *x)
@@ -190,7 +190,7 @@ char *bitostr(const BigInt *x)
 {
     uint8_t offset = 0;
     size_t slen = x->len + 1 + (x->sign == -1);
-    char *str = malloc(sizeof(char) * slen);
+    char *str = malloc(slen * sizeof(char));
 
     if (str == NULL)
         return NULL;
