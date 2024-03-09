@@ -2,6 +2,8 @@
 
 #include <stdint.h>
 
+#define BASE 10
+
 typedef struct 
 {
     uint8_t *digits;
@@ -33,31 +35,31 @@ char *bitostr(const BigInt *x);
 BigInt *postobi(uint8_t n);
 
 /* a + b */
-BigInt *bigint_sum(const BigInt *a, const BigInt *b, uint8_t base);
+BigInt *bigint_sum(const BigInt *a, const BigInt *b);
 /* a - b */
-BigInt *bigint_subtract(const BigInt *a, const BigInt *b, uint8_t base);
+BigInt *bigint_subtract(const BigInt *a, const BigInt *b);
 /* a * b */
-BigInt *bigint_multiply(const BigInt *a, const BigInt *b, uint8_t base);
+BigInt *bigint_multiply(const BigInt *a, const BigInt *b);
 /* a! */
-BigInt *bigint_factorial(const BigInt *a, uint8_t base);
+BigInt *bigint_factorial(const BigInt *a);
 /* a / b */
-BigInt *bigint_divide(const BigInt *a, const BigInt *b, uint8_t base);
+BigInt *bigint_divide(const BigInt *a, const BigInt *b);
 /* a % b */
-BigInt *bigint_mod(const BigInt *a, const BigInt *b, uint8_t base);
+BigInt *bigint_mod(const BigInt *a, const BigInt *b);
 
 /* a += b */
-uint8_t bigint_add(BigInt **a, const BigInt *b, uint8_t base);
+uint8_t bigint_add(BigInt **a, const BigInt *b);
 /* a -= b */
-uint8_t bigint_sub(BigInt **a, const BigInt *b, uint8_t base);
+uint8_t bigint_sub(BigInt **a, const BigInt *b);
 /* a *= b */
-uint8_t bigint_mul(BigInt **a, const BigInt *b, uint8_t base);
+uint8_t bigint_mul(BigInt **a, const BigInt *b);
 /* a += digit */
-uint8_t bigint_adddigit(BigInt **a, uint8_t digit, uint8_t base);
+uint8_t bigint_adddigit(BigInt **a, uint8_t digit);
 /* a*= digit */
-uint8_t bigint_muldigit(BigInt **a, uint8_t digit, uint8_t base);
+uint8_t bigint_muldigit(BigInt **a, uint8_t digit);
 
 /* a, b = b, a */
 uint8_t bigint_swap(BigInt **a, BigInt **b);
 
-/* returns the greates common divisor of a and b with base = 10 */
+/* returns the greates common divisor of a and b */
 BigInt *bigint_gcd(const BigInt *a, const BigInt *b);

@@ -241,18 +241,17 @@ BigInt *postobi(uint8_t n)
     return x;
 }
 
-/* restriction: 2 <= base <= 10 */
-BigInt *bigint_sum(const BigInt *a, const BigInt *b, uint8_t base)
+BigInt *bigint_sum(const BigInt *a, const BigInt *b)
 {
     BigInt *x;
     uint8_t sum = 0;
     uint8_t carry = 0;
 
-    if (a == NULL || b == NULL || base < 2 || base > 10)
+    if (a == NULL || b == NULL)
         return NULL;
 
     if (bigint_isless(a, b))
-        return bigint_sum(b, a, base);
+        return bigint_sum(b, a);
     if (b->sign != 1)
     {
         BigInt *bpos = bigint_copy(b);
@@ -261,7 +260,7 @@ BigInt *bigint_sum(const BigInt *a, const BigInt *b, uint8_t base)
 
         bpos->sign = 1;
 
-        x = bigint_subtract(a, bpos, base);
+        x = bigint_subtract(a, bpos);
         bigint_free(bpos);
 
         return x;
@@ -277,10 +276,10 @@ BigInt *bigint_sum(const BigInt *a, const BigInt *b, uint8_t base)
         if (i < b->len)
             sum += b->digits[i];
         
-        if (sum >= base)
+        if (sum >= BASE)
         {
-            carry = sum / base;
-            sum %= base;
+            carry = sum / BASE;
+            sum %= BASE;
         }
         else
             carry = 0;
@@ -296,19 +295,18 @@ BigInt *bigint_sum(const BigInt *a, const BigInt *b, uint8_t base)
     return x;
 }
 
-/* 2 <= base <= 10 */
-BigInt *bigint_subtract(const BigInt *a, const BigInt *b, uint8_t base)
+BigInt *bigint_subtract(const BigInt *a, const BigInt *b)
 {
     BigInt *x;
     int8_t diff = 0;
     int8_t borrow = 0;
 
-    if (a == NULL || b == NULL || base < 2 || base > 10)
+    if (a == NULL || b == NULL)
         return NULL;
 
     if (bigint_isless(a, b))
     {
-        x = bigint_subtract(b, a, base);
+        x = bigint_subtract(b, a);
         x->sign *= -1;
 
         return x;
@@ -321,7 +319,7 @@ BigInt *bigint_subtract(const BigInt *a, const BigInt *b, uint8_t base)
 
         bpos->sign = 1;
 
-        x = bigint_sum(a, bpos, base);
+        x = bigint_sum(a, bpos);
         bigint_free(bpos);
 
         return x;
@@ -341,7 +339,7 @@ BigInt *bigint_subtract(const BigInt *a, const BigInt *b, uint8_t base)
         {
             borrow = -1;
             if (i != a->len - 1)
-                diff += base;
+                diff += BASE;
         }
         else
             borrow = 0;
@@ -354,13 +352,13 @@ BigInt *bigint_subtract(const BigInt *a, const BigInt *b, uint8_t base)
     return x;
 }
 
-static BigInt *_multiply_digit(const BigInt *a, uint8_t digit, uint8_t base, size_t offset)
+static BigInt *_multiply_digit(const BigInt *a, uint8_t digit, size_t offset)
 {
     BigInt *x;
     uint8_t prod = 0;
     uint8_t carry = 0;
 
-    if (a == NULL || a->digits == NULL || digit > 9 || base < 2 || base > 10)
+    if (a == NULL || a->digits == NULL || digit > 9)
         return NULL;
 
     x = bigint_init_n(a->len + 1 + offset);
@@ -372,10 +370,10 @@ static BigInt *_multiply_digit(const BigInt *a, uint8_t digit, uint8_t base, siz
     for (size_t i = 0; i < a->len; i++)
     {
         prod = a->digits[i] * digit + carry;
-        if (prod >= base)
+        if (prod >= BASE)
         {
-            carry = prod / base;
-            prod %= base;
+            carry = prod / BASE;
+            prod %= BASE;
         }
         else
             carry = 0;
@@ -391,16 +389,15 @@ static BigInt *_multiply_digit(const BigInt *a, uint8_t digit, uint8_t base, siz
     return x;
 }
 
-BigInt *bigint_multiply(const BigInt *a, const BigInt *b, uint8_t base)
+BigInt *bigint_multiply(const BigInt *a, const BigInt *b)
 {
     BigInt *x;
 
-    if (a == NULL || b == NULL || a->digits == NULL || b->digits == NULL
-        || base < 2 || base > 10)
+    if (a == NULL || b == NULL || a->digits == NULL || b->digits == NULL)
         return NULL;
 
     if (bigint_isless(a, b))
-        return bigint_multiply(b, a, base);
+        return bigint_multiply(b, a);
     if (b->sign != 1)
     {
         BigInt *bpos = bigint_copy(b);
@@ -408,7 +405,7 @@ BigInt *bigint_multiply(const BigInt *a, const BigInt *b, uint8_t base)
             return NULL;
 
         bpos->sign = 1;
-        x = bigint_multiply(a, bpos, base);
+        x = bigint_multiply(a, bpos);
 
         if (!bigint_iszero(a))
             x->sign *= -1;
@@ -429,8 +426,8 @@ BigInt *bigint_multiply(const BigInt *a, const BigInt *b, uint8_t base)
         if (b->digits[i] == 0)
             continue;
 
-        BigInt *prod = _multiply_digit(a, b->digits[i], base, i);
-        bigint_add(&x, prod, base);
+        BigInt *prod = _multiply_digit(a, b->digits[i], i);
+        bigint_add(&x, prod);
 
         bigint_free(prod);
     }
@@ -440,20 +437,20 @@ BigInt *bigint_multiply(const BigInt *a, const BigInt *b, uint8_t base)
     return x;
 }
 
-BigInt *bigint_factorial(const BigInt *a, uint8_t base)
+BigInt *bigint_factorial(const BigInt *a)
 {
     BigInt *res;
     BigInt *mul;
     BigInt *one;
     BigInt *top_bound;
 
-    if (a == NULL || a->sign != 1 || base < 2 || base > 10)
+    if (a == NULL || a->sign != 1)
         return NULL;
 
     res = strtobi("1");
     mul = strtobi("2");
     one = strtobi("1");
-    top_bound = bigint_sum(a, one, base);
+    top_bound = bigint_sum(a, one);
 
     if (res == NULL || mul == NULL || one == NULL || top_bound == NULL)
     {
@@ -463,8 +460,8 @@ BigInt *bigint_factorial(const BigInt *a, uint8_t base)
 
     while (bigint_isless(mul, top_bound))
     {
-        bigint_mul(&res, mul, base);
-        bigint_adddigit(&mul, 1, base);
+        bigint_mul(&res, mul);
+        bigint_adddigit(&mul, 1);
 
         if (res == NULL || mul == NULL)
         {
@@ -480,93 +477,93 @@ BigInt *bigint_factorial(const BigInt *a, uint8_t base)
     return res;
 }
 
-uint8_t bigint_add(BigInt **a, const BigInt *b, uint8_t base)
+uint8_t bigint_add(BigInt **a, const BigInt *b)
 {
     BigInt *old;
 
-    if (*a == NULL || b == NULL || base < 2 || base > 10)
+    if (*a == NULL || b == NULL)
         return 1;
 
     old = *a;
-    *a = bigint_sum(*a, b, base);
+    *a = bigint_sum(*a, b);
 
     bigint_free(old);
 
     return 0;
 }
 
-uint8_t bigint_sub(BigInt **a, const BigInt *b, uint8_t base)
+uint8_t bigint_sub(BigInt **a, const BigInt *b)
 {
     BigInt *old;
 
-    if (*a == NULL || b == NULL || base < 2 || base > 10)
+    if (*a == NULL || b == NULL)
         return 1;
 
     old = *a;
-    *a = bigint_subtract(*a, b, base);
+    *a = bigint_subtract(*a, b);
 
     bigint_free(old);
 
     return 0;
 }
 
-uint8_t bigint_mul(BigInt **a, const BigInt *b, uint8_t base)
+uint8_t bigint_mul(BigInt **a, const BigInt *b)
 {
     BigInt *old;
 
-    if (*a == NULL || b == NULL || base < 2 || base > 10)
+    if (*a == NULL || b == NULL)
         return 1;
 
     old = *a;
-    *a = bigint_multiply(*a, b, base);
+    *a = bigint_multiply(*a, b);
 
     bigint_free(old);
 
     return 0;
 }
 
-uint8_t bigint_adddigit(BigInt **a, uint8_t digit, uint8_t base)
+uint8_t bigint_adddigit(BigInt **a, uint8_t digit)
 {
     BigInt *bigdigit;
 
-    if (*a == NULL || digit >= base || base < 2 || base > 10)
+    if (*a == NULL || digit >= BASE)
         return 1;
 
     bigdigit = postobi(digit);
     if (bigdigit == NULL)
         return 1;
 
-    bigint_add(a, bigdigit, base);
+    bigint_add(a, bigdigit);
     bigint_free(bigdigit);
 
     return 0;
 }
 
-uint8_t bigint_muldigit(BigInt **a, uint8_t digit, uint8_t base)
+uint8_t bigint_muldigit(BigInt **a, uint8_t digit)
 {
     BigInt *bigdigit;
 
-    if (*a == NULL || base < 2 || base > 10)
+    if (*a == NULL)
         return 1;
 
     bigdigit = postobi(digit);
     if (bigdigit == NULL)
         return 1;
 
-    bigint_mul(a, bigdigit, base);
+    bigint_mul(a, bigdigit);
     bigint_free(bigdigit);
 
     return 0;
 }
 
-BigInt *bigint_divide(const BigInt *a, const BigInt *b, uint8_t base)
+BigInt *bigint_divide(const BigInt *a, const BigInt *b)
 {
     BigInt *q, *cur, *bpos;
     size_t cnt;
     uint8_t flag = 0;
     uint8_t was_division = 0;
 
-    if (a == NULL || b == NULL || bigint_iszero(b) || base < 2 || base > 10)
+    if (a == NULL || b == NULL || bigint_iszero(b))
         return NULL;
 
     bpos = bigint_copy(b);
@@ -588,25 +585,25 @@ BigInt *bigint_divide(const BigInt *a, const BigInt *b, uint8_t base)
                 flag = 1;
 
             digit = a->digits[cnt--];
-            bigint_muldigit(&cur, 10, base);
-            bigint_adddigit(&cur, digit, base);
+            bigint_muldigit(&cur, 10);
+            bigint_adddigit(&cur, digit);
 
             if (was_division)
-                bigint_muldigit(&q, 10, base);
+                bigint_muldigit(&q, 10);
         }
 
         while (bigint_isless(bpos, cur) || bigint_iseq(bpos, cur))
         {
-            bigint_sub(&cur, bpos, base);
+            bigint_sub(&cur, bpos);
             divcnt++;
         }
 
         was_division = 1;
-        bigint_adddigit(&q, divcnt, base);
+        bigint_adddigit(&q, divcnt);
     }
 
     if (a->sign != 1 && !bigint_iszero(cur))
-        bigint_adddigit(&q, 1, base);
+        bigint_adddigit(&q, 1);
 
     q->sign = a->sign * b->sign;
 
@@ -616,25 +613,25 @@ BigInt *bigint_divide(const BigInt *a, const BigInt *b, uint8_t base)
     return q;
 }
 
-BigInt *bigint_mod(const BigInt *a, const BigInt *b, uint8_t base)
+BigInt *bigint_mod(const BigInt *a, const BigInt *b)
 {
     BigInt *r, *q, *bq;
 
-    if (a == NULL || b == NULL || bigint_iszero(b) || base < 2 || base > 10)
+    if (a == NULL || b == NULL || bigint_iszero(b))
         return NULL;
 
-    q = bigint_divide(a, b, base);
+    q = bigint_divide(a, b);
     if (q == NULL)
         return NULL;
 
-    bq = bigint_multiply(b, q, base);
+    bq = bigint_multiply(b, q);
     if (bq == NULL)
     {
         bigint_free(q);
         return NULL;
     }
 
-    r = bigint_subtract(a, bq, base);
+    r = bigint_subtract(a, bq);
 
     bigint_free(q);
     bigint_free(bq);
@@ -653,7 +650,6 @@ uint8_t bigint_swap(BigInt **a, BigInt **b)
     return 0;
 }
 
-/* base = 10 only? */
 BigInt *bigint_gcd(const BigInt *a, const BigInt *b)
 {
     BigInt *apos, *bpos;
@@ -676,7 +672,7 @@ BigInt *bigint_gcd(const BigInt *a, const BigInt *b)
         BigInt *old_apos = apos;
 
         apos = bpos;
-        bpos = bigint_mod(old_apos, bpos, 10);
+        bpos = bigint_mod(old_apos, bpos);
 
         bigint_free(old_apos);
     }
