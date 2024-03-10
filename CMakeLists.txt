@@ -8,5 +8,5 @@ set(EXENAME bigint)
 add_subdirectory(bigintlib)
 add_executable(${EXENAME} ${SOURCES})
 
-target_compile_options(${EXENAME} PRIVATE -Wall)
+target_compile_options(${EXENAME} PRIVATE -Wall -g)
 target_link_libraries(${EXENAME} PUBLIC bigintlib)

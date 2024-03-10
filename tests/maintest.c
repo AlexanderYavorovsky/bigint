@@ -290,7 +290,7 @@ MU_TEST_SUITE(suite_sum)
 {
     MU_RUN_TEST(test_sum10_zero);
     MU_RUN_TEST(test_sum10_pospos);
-    MU_RUN_TEST(test_sum10_negpos); 
+    MU_RUN_TEST(test_sum10_negpos);
 }
 
 MU_TEST(test_sub10_zero)
@@ -490,24 +490,11 @@ MU_TEST(test_postobi)
 
 MU_TEST(test_adddigit)
 {
-    BigInt *x = strtobi("134");
+    BigInt *x = strtobi("9999999");
     uint8_t digit = 9;
-    BigInt *actual = strtobi("143");
+    BigInt *actual = strtobi("10000008");
 
     bigint_adddigit(&x, digit);
-    mu_check(bigint_iseq(actual, x));
-    
-    bigint_free(x);
-    bigint_free(actual);
-}
-
-MU_TEST(test_muldigit)
-{
-    BigInt *x = strtobi("134");
-    uint8_t digit = 9;
-    BigInt *actual = strtobi("1206");
-
-    bigint_muldigit(&x, digit);
     mu_check(bigint_iseq(actual, x));
 
     bigint_free(x);
@@ -521,7 +508,6 @@ MU_TEST_SUITE(suite_short)
     MU_RUN_TEST(test_mul10);
     MU_RUN_TEST(test_postobi);
     MU_RUN_TEST(test_adddigit);
-    MU_RUN_TEST(test_muldigit);
 }
 
 MU_TEST(test_div10_self)

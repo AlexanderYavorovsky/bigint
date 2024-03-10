@@ -18,7 +18,7 @@ static BigInt *bigint_init_n(size_t len)
     if(x == NULL)
         return NULL;
     
-    x->digits = malloc(len * sizeof(x->digits));
+    x->digits = calloc(len, sizeof(x->digits));
     if (x->digits == NULL)
     {
         free(x);
@@ -485,40 +485,50 @@ void bigint_mul(BigInt **a, const BigInt *b)
 
 uint8_t bigint_adddigit(BigInt **a, uint8_t digit)
 {
-    BigInt *bigdigit;
+    uint8_t sum, carry = 0;
+    size_t len = (*a)->len;
 
-    if (digit >= BASE)
-        return 0;
+    for (size_t i = 0; i < len; i++)
+    {
+        sum = (*a)->digits[i] + carry;
+        if (i == 0)
+            sum += digit;
 
-    bigdigit = postobi(digit);
-    if (bigdigit == NULL)
-        return 0;
+        carry = sum / BASE;
+        (*a)->digits[i] = sum % BASE;
+        if (carry == 0)
+            break;
+    }
 
-    bigint_add(a, bigdigit);
-    bigint_free(bigdigit);
+    if (carry > 0 && bigint_resize(*a, len + 1))
+            (*a)->digits[len] = carry;
 
     return 1;
 }
 
-uint8_t bigint_muldigit(BigInt **a, uint8_t digit)
+void bigint_addoffset(BigInt **x, size_t offset)
 {
-    BigInt *bigdigit;
+    BigInt *oldx;
 
-    bigdigit = postobi(digit);
-    if (bigdigit == NULL)
-        return 0;
+    if (*x == NULL || offset == 0)
+        return;
 
-    bigint_mul(a, bigdigit);
-    bigint_free(bigdigit);
+    oldx = *x;
+    *x = bigint_init_n(oldx->len + offset);
+    if (*x == NULL)
+        return;
 
-    return 1;
+    memcpy((*x)->digits + offset, oldx->digits, oldx->len);
+    bigint_normalize(*x);
+
+    bigint_free(oldx);
 }
 
 BigInt *bigint_divide(const BigInt *a, const BigInt *b)
 {
     BigInt *q, *cur, *bpos;
     size_t cnt;
-    uint8_t flag = 0;
+    uint8_t endflag = 0;
     uint8_t was_division = 0;
 
     if (bigint_iszero(b))
@@ -531,23 +541,23 @@ BigInt *bigint_divide(const BigInt *a, const BigInt *b)
     q = strtobi("0");
     cur = strtobi("0");
 
-    while (!flag)
+    while (!endflag)
     {
         uint8_t divcnt = 0;
 
-        while (!flag && bigint_isless(cur, bpos))
+        while (!endflag && bigint_isless(cur, bpos))
         {
             uint8_t digit;
 
             if (cnt == 0)
-                flag = 1;
+                endflag = 1;
 
             digit = a->digits[cnt--];
-            bigint_muldigit(&cur, 10);
+            bigint_addoffset(&cur, 1);
             bigint_adddigit(&cur, digit);
 
             if (was_division)
-                bigint_muldigit(&q, 10);
+                bigint_addoffset(&q, 1);
         }
 
         while (bigint_isless(bpos, cur) || bigint_iseq(bpos, cur))

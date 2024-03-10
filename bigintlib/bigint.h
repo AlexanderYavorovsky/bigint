@@ -55,8 +55,6 @@ void bigint_sub(BigInt **a, const BigInt *b);
 void bigint_mul(BigInt **a, const BigInt *b);
 /* a += digit */
 uint8_t bigint_adddigit(BigInt **a, uint8_t digit);
-/* a*= digit */
-uint8_t bigint_muldigit(BigInt **a, uint8_t digit);
 
 /* a, b = b, a */
 void bigint_swap(BigInt **a, BigInt **b);
