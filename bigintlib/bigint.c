@@ -334,83 +334,34 @@ BigInt *bigint_subtract(const BigInt *a, const BigInt *b)
     return x;
 }
 
-static BigInt *_multiply_digit(const BigInt *a, uint8_t digit, size_t offset)
-{
-    BigInt *x;
-    uint8_t prod = 0;
-    uint8_t carry = 0;
-
-    if (a == NULL || a->digits == NULL || digit > 9)
-        return NULL;
-
-    x = bigint_init_n(a->len + 1 + offset);
-    if (x == NULL)
-        return NULL;
-
-    bigint_fillzero(x, 0, offset);
-
-    for (size_t i = 0; i < a->len; i++)
-    {
-        prod = a->digits[i] * digit + carry;
-        if (prod >= BASE)
-        {
-            carry = prod / BASE;
-            prod %= BASE;
-        }
-        else
-            carry = 0;
-
-        x->digits[i + offset] = prod;
-    }
-
-    if (carry > 0)
-        x->digits[x->len - 1] = carry;
-    else
-        bigint_resize(x, x->len - 1);
-
-    return x;
-}
-
 BigInt *bigint_multiply(const BigInt *a, const BigInt *b)
 {
     BigInt *x;
+    uint8_t prod = 0, carry;
 
-    if (bigint_isless(a, b))
-        return bigint_multiply(b, a);
-    if (b->sign != 1)
+    if (bigint_iszero(a) || bigint_iszero(b))
     {
-        BigInt *bpos = bigint_copy(b);
-        if (bpos == NULL)
-            return NULL;
-
-        bpos->sign = 1;
-        x = bigint_multiply(a, bpos);
-
-        if (!bigint_iszero(a))
-            x->sign *= -1;
-
-        bigint_free(bpos);
-
+        x = strtobi("0");
         return x;
     }
 
-    x = bigint_init_n(a->len + b->len + 2);
+    x = bigint_init_n(a->len + b->len + 1);
     if (x == NULL)
         return NULL;
 
-    bigint_fillzero(x, 0, x->len);
-
     for (size_t i = 0; i < b->len; i++)
     {
-        if (b->digits[i] == 0)
-            continue;
-
-        BigInt *prod = _multiply_digit(a, b->digits[i], i);
-        bigint_add(&x, prod);
-
-        bigint_free(prod);
+        carry = 0;
+        for (size_t j = 0; j < a->len; j++)
+        {
+            prod = a->digits[j] * b->digits[i] + x->digits[i + j] + carry;
+            carry = prod / BASE;
+            x->digits[i + j] = prod % BASE;
+        }
+        x->digits[i + a->len] = carry;
     }
 
+    x->sign = a->sign * b->sign;
     bigint_normalize(x);
 
     return x;
@@ -426,9 +377,9 @@ BigInt *bigint_factorial(const BigInt *a)
     if (a->sign != 1)
         return NULL;
 
-    res = strtobi("1");
-    mul = strtobi("2");
-    one = strtobi("1");
+    res = postobi(1);
+    mul = postobi(2);
+    one = postobi(1);
     top_bound = bigint_sum(a, one);
 
     if (res == NULL || mul == NULL || one == NULL || top_bound == NULL)
@@ -528,8 +479,7 @@ BigInt *bigint_divide(const BigInt *a, const BigInt *b)
 {
     BigInt *q, *cur, *bpos;
     size_t cnt;
-    uint8_t endflag = 0;
-    uint8_t was_division = 0;
+    uint8_t endflag = 0, was_division = 0;
 
     if (bigint_iszero(b))
         return NULL;
