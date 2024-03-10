@@ -7,12 +7,9 @@
 
 void bigint_free(BigInt *x)
 {
-    if (x != NULL)
-    {
-        if (x->digits != NULL)
-            free(x->digits);
-        free(x);
-    }
+    if (x->digits != NULL)
+        free(x->digits);
+    free(x);
 }
 
 static BigInt *bigint_init_n(size_t len)
@@ -37,9 +34,6 @@ static BigInt *bigint_init_n(size_t len)
 BigInt *bigint_copy(const BigInt *x)
 {
     BigInt *copy;
-
-    if (x == NULL)
-        return NULL;
 
     copy = bigint_init_n(x->len);
     if (copy == NULL)
@@ -119,9 +113,6 @@ uint8_t bigint_iszero(const BigInt *x)
 
 uint8_t bigint_isless(const BigInt *a, const BigInt *b)
 {
-    if (a == NULL || b == NULL)
-        return 0;
-
     if (a->sign != b->sign)
         return a->sign != 1;
 
@@ -496,17 +487,17 @@ uint8_t bigint_adddigit(BigInt **a, uint8_t digit)
 {
     BigInt *bigdigit;
 
-    if (*a == NULL || digit >= BASE)
-        return 1;
+    if (digit >= BASE)
+        return 0;
 
     bigdigit = postobi(digit);
     if (bigdigit == NULL)
-        return 1;
+        return 0;
 
     bigint_add(a, bigdigit);
     bigint_free(bigdigit);
 
-    return 0;
+    return 1;
 }
 
 uint8_t bigint_muldigit(BigInt **a, uint8_t digit)
@@ -515,12 +506,12 @@ uint8_t bigint_muldigit(BigInt **a, uint8_t digit)
 
     bigdigit = postobi(digit);
     if (bigdigit == NULL)
-        return 1;
+        return 0;
 
     bigint_mul(a, bigdigit);
     bigint_free(bigdigit);
 
-    return 0;
+    return 1;
 }
 
 BigInt *bigint_divide(const BigInt *a, const BigInt *b)
