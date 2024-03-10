@@ -1,4 +1,4 @@
-/* Yavorovsky Alexander, 23.02.2024 */
+/* Yavorovsky Alexander, 10.03.2024 */
 
 #include <stdlib.h>
 #include <limits.h>
@@ -6,34 +6,6 @@
 
 #include "bigint.h"
 #include "minunit.h"
-
-MU_TEST(test_init_max)
-{
-    size_t len = UINT_MAX;
-    BigInt *x = bigint_init_n(len);
-
-    mu_check(x != NULL);
-    mu_check(x->len == len);
-
-    bigint_free(x);
-}
-
-MU_TEST(test_init_min)
-{
-    size_t len = 1;
-    BigInt *x = bigint_init_n(len);
-
-    mu_check(x != NULL);
-    mu_check(x->len == len);
-
-    bigint_free(x);
-}
-
-MU_TEST_SUITE(suite_init)
-{
-    MU_RUN_TEST(test_init_max);
-    MU_RUN_TEST(test_init_min);
-}
 
 MU_TEST(test_str_pos)
 {
@@ -226,70 +198,6 @@ MU_TEST_SUITE(suite_iszero)
     MU_RUN_TEST(test_iszero_pos);
 }
 
-MU_TEST(test_normalize_pos)
-{
-    BigInt *x = strtobi("000123");
-    char *sx;
-
-    bigint_normalize(x);
-    sx = bitostr(x);
-
-    mu_assert_string_eq("123", sx);
-
-    bigint_free(x);
-    free(sx);
-}
-
-MU_TEST(test_normalize_neg)
-{
-    BigInt *x = strtobi("-000123");
-    char *sx;
-
-    bigint_normalize(x);
-    sx = bitostr(x);
-
-    mu_assert_string_eq("-123", sx);
-
-    bigint_free(x);
-    free(sx);
-}
-
-MU_TEST(test_normalize_plus)
-{
-    BigInt *x = strtobi("+000123");
-    char *sx;
-
-    bigint_normalize(x);
-    sx = bitostr(x);
-
-    mu_assert_string_eq("123", sx);
-
-    bigint_free(x);
-    free(sx);
-}
-
-MU_TEST(test_normalize_negzeros)
-{
-    BigInt *x = strtobi("-0000000");
-    char *sx;
-
-    bigint_normalize(x);
-    sx = bitostr(x);
-
-    mu_assert_string_eq("0", sx);
-
-    bigint_free(x);
-    free(sx);
-}
-
-MU_TEST_SUITE(suite_normalize)
-{
-    MU_RUN_TEST(test_normalize_pos);
-    MU_RUN_TEST(test_normalize_neg);
-    MU_RUN_TEST(test_normalize_plus);
-    MU_RUN_TEST(test_normalize_negzeros);
-}
-
 MU_TEST(test_iseq_reflection)
 {
     BigInt *x = strtobi("13");
@@ -324,11 +232,10 @@ MU_TEST(test_sum10_zero)
     BigInt *zero = strtobi("0");
     BigInt *x = strtobi("123");
     BigInt *xneg = strtobi("-123");
-    uint8_t base = 10;
-    BigInt *sum_left = bigint_sum(zero, x, base);
-    BigInt *sum_right = bigint_sum(x, zero, base);
-    BigInt *sum_neg_left = bigint_sum(zero, xneg, base);
-    BigInt *sum_neg_right = bigint_sum(xneg, zero, base);
+    BigInt *sum_left = bigint_sum(zero, x);
+    BigInt *sum_right = bigint_sum(x, zero);
+    BigInt *sum_neg_left = bigint_sum(zero, xneg);
+    BigInt *sum_neg_right = bigint_sum(xneg, zero);
 
     mu_check(bigint_iseq(x, sum_left));
     mu_check(bigint_iseq(x, sum_right));
@@ -349,9 +256,8 @@ MU_TEST(test_sum10_pospos)
 {
     BigInt *a = strtobi("999");
     BigInt *b = strtobi("123");
-    uint8_t base = 10;
-    BigInt *sum_left = bigint_sum(a, b, base);
-    BigInt *sum_right = bigint_sum(b, a, base);
+    BigInt *sum_left = bigint_sum(a, b);
+    BigInt *sum_right = bigint_sum(b, a);
     BigInt *actual = strtobi("1122");
 
     mu_check(bigint_iseq(sum_left, sum_right));
@@ -369,8 +275,7 @@ MU_TEST(test_sum10_negpos)
 {
     BigInt *a = strtobi("-341");
     BigInt *b = strtobi("283");
-    uint8_t base = 10;
-    BigInt *sum = bigint_sum(a, b, base);
+    BigInt *sum = bigint_sum(a, b);
     BigInt *actual = strtobi("-58");
 
     mu_check(bigint_iseq(actual, sum));
@@ -385,7 +290,7 @@ MU_TEST_SUITE(suite_sum)
 {
     MU_RUN_TEST(test_sum10_zero);
     MU_RUN_TEST(test_sum10_pospos);
-    MU_RUN_TEST(test_sum10_negpos); 
+    MU_RUN_TEST(test_sum10_negpos);
 }
 
 MU_TEST(test_sub10_zero)
@@ -393,9 +298,8 @@ MU_TEST(test_sub10_zero)
     BigInt *zero = strtobi("0");
     BigInt *x = strtobi("123");
     BigInt *xneg = strtobi("-123");
-    uint8_t base = 10;
-    BigInt *diff_pos = bigint_subtract(x, zero, base);
-    BigInt *diff_neg = bigint_subtract(xneg, zero, base);
+    BigInt *diff_pos = bigint_subtract(x, zero);
+    BigInt *diff_neg = bigint_subtract(xneg, zero);
 
     mu_check(bigint_iseq(x, diff_pos));
     mu_check(bigint_iseq(xneg, diff_neg));
@@ -412,8 +316,7 @@ MU_TEST(test_sub10_pospos)
     BigInt *a = strtobi("341");
     BigInt *b = strtobi("932");
     BigInt *actual = strtobi("-591");
-    uint8_t base = 10;
-    BigInt *diff = bigint_subtract(a, b, base);
+    BigInt *diff = bigint_subtract(a, b);
 
     mu_check(bigint_iseq(actual, diff));
 
@@ -434,10 +337,9 @@ MU_TEST(test_mul10_zero)
     BigInt *zero = strtobi("0");
     BigInt *x = strtobi("123");
     BigInt *xneg = strtobi("-123");
-    uint8_t base = 10;
-    BigInt *mul_left = bigint_multiply(zero, x, base);
-    BigInt *mul_right = bigint_multiply(x, zero, base);
-    BigInt *mul_neg = bigint_multiply(xneg, zero, base);
+    BigInt *mul_left = bigint_multiply(zero, x);
+    BigInt *mul_right = bigint_multiply(x, zero);
+    BigInt *mul_neg = bigint_multiply(xneg, zero);
 
     mu_check(bigint_iseq(zero, mul_left));
     mu_check(bigint_iseq(zero, mul_right));
@@ -456,10 +358,9 @@ MU_TEST(test_mul10_one)
     BigInt *one = strtobi("1");
     BigInt *x = strtobi("123");
     BigInt *xneg = strtobi("-123");
-    uint8_t base = 10;
-    BigInt *mul_left = bigint_multiply(one, x, base);
-    BigInt *mul_right = bigint_multiply(x, one, base);
-    BigInt *mul_neg = bigint_multiply(xneg, one, base);
+    BigInt *mul_left = bigint_multiply(one, x);
+    BigInt *mul_right = bigint_multiply(x, one);
+    BigInt *mul_neg = bigint_multiply(xneg, one);
 
     mu_check(bigint_iseq(x, mul_left));
     mu_check(bigint_iseq(x, mul_right));
@@ -478,8 +379,7 @@ MU_TEST(test_mul10_negpos)
     BigInt *a = strtobi("-1109");
     BigInt *b = strtobi("29480");
     BigInt *actual = strtobi("-32693320");
-    uint8_t base = 10;
-    BigInt *mul = bigint_multiply(a, b, base);
+    BigInt *mul = bigint_multiply(a, b);
 
     mu_check(bigint_iseq(actual, mul));
 
@@ -492,8 +392,7 @@ MU_TEST(test_mul10_negpos)
 MU_TEST(test_mul10_factorial)
 {
     BigInt *x = strtobi("100");
-    uint8_t base = 10;
-    BigInt *factorial = bigint_factorial(x, base);
+    BigInt *factorial = bigint_factorial(x);
     BigInt *actual = strtobi("93326215443944152681699238856266700490715968264381621468592963895217599993229915608941463976156518286253697920827223758251185210916864000000000000000000000000");
 
     mu_check(bigint_iseq(actual, factorial));
@@ -506,8 +405,7 @@ MU_TEST(test_mul10_factorial)
 MU_TEST(test_mul10_factorialzero)
 {
     BigInt *zero = strtobi("0");
-    uint8_t base = 10;
-    BigInt *factorial = bigint_factorial(zero, base);
+    BigInt *factorial = bigint_factorial(zero);
     BigInt *one = strtobi("1");
 
     mu_check(bigint_iseq(one, factorial));
@@ -520,8 +418,7 @@ MU_TEST(test_mul10_factorialzero)
 MU_TEST(test_mul10_factorialneg)
 {
     BigInt *neg = strtobi("-124");
-    uint8_t base = 10;
-    BigInt *factorial = bigint_factorial(neg, base);
+    BigInt *factorial = bigint_factorial(neg);
 
     mu_check(factorial == NULL);
 
@@ -542,10 +439,9 @@ MU_TEST(test_add10)
 {
     BigInt *a = strtobi("40");
     BigInt *b = strtobi("234");
-    uint8_t base = 10;
     BigInt *actual = strtobi("274");
 
-    bigint_add(&a, b, base);
+    bigint_add(&a, b);
     mu_check(bigint_iseq(a, actual));
 
     bigint_free(a);
@@ -557,10 +453,9 @@ MU_TEST(test_sub10)
 {
     BigInt *a = strtobi("40");
     BigInt *b = strtobi("234");
-    uint8_t base = 10;
     BigInt *actual = strtobi("-194");
 
-    bigint_sub(&a, b, base);
+    bigint_sub(&a, b);
     mu_check(bigint_iseq(a, actual));
 
     bigint_free(a);
@@ -572,10 +467,9 @@ MU_TEST(test_mul10)
 {
     BigInt *a = strtobi("40");
     BigInt *b = strtobi("234");
-    uint8_t base = 10;
     BigInt *actual = strtobi("9360");
 
-    bigint_mul(&a, b, base);
+    bigint_mul(&a, b);
     mu_check(bigint_iseq(a, actual));
 
     bigint_free(a);
@@ -585,7 +479,7 @@ MU_TEST(test_mul10)
 
 MU_TEST(test_postobi)
 {
-    BigInt *x = _postobi(49);
+    BigInt *x = postobi(49);
     BigInt *actual = strtobi("49");
 
     mu_check(bigint_iseq(actual, x));
@@ -596,26 +490,11 @@ MU_TEST(test_postobi)
 
 MU_TEST(test_adddigit)
 {
-    BigInt *x = strtobi("134");
+    BigInt *x = strtobi("9999999");
     uint8_t digit = 9;
-    uint8_t base = 10;
-    BigInt *actual = strtobi("143");
+    BigInt *actual = strtobi("10000008");
 
-    bigint_adddigit(&x, digit, base);
-    mu_check(bigint_iseq(actual, x));
-    
-    bigint_free(x);
-    bigint_free(actual);
-}
-
-MU_TEST(test_muldigit)
-{
-    BigInt *x = strtobi("134");
-    uint8_t digit = 9;
-    uint8_t base = 10;
-    BigInt *actual = strtobi("1206");
-
-    bigint_muldigit(&x, digit, base);
+    bigint_adddigit(&x, digit);
     mu_check(bigint_iseq(actual, x));
 
     bigint_free(x);
@@ -629,15 +508,13 @@ MU_TEST_SUITE(suite_short)
     MU_RUN_TEST(test_mul10);
     MU_RUN_TEST(test_postobi);
     MU_RUN_TEST(test_adddigit);
-    MU_RUN_TEST(test_muldigit);
 }
 
 MU_TEST(test_div10_self)
 {
     BigInt *a = strtobi("5");
     BigInt *b = strtobi("5");
-    uint8_t base = 10;
-    BigInt *q = bigint_divide(a, b, base);
+    BigInt *q = bigint_divide(a, b);
     BigInt *actual = strtobi("1");
 
     mu_check(bigint_iseq(actual, q));
@@ -652,8 +529,7 @@ MU_TEST(test_div10_pospos)
 {
     BigInt *a = strtobi("126");
     BigInt *b = strtobi("3");
-    uint8_t base = 10;
-    BigInt *q = bigint_divide(a, b, base);
+    BigInt *q = bigint_divide(a, b);
     BigInt *actual = strtobi("42");
 
     mu_check(bigint_iseq(actual, q));
@@ -668,8 +544,7 @@ MU_TEST(test_div10_remain)
 {
     BigInt *a = strtobi("127");
     BigInt *b = strtobi("32");
-    uint8_t base = 10;
-    BigInt *q = bigint_divide(a, b, base);
+    BigInt *q = bigint_divide(a, b);
     BigInt *actual = strtobi("3");
 
     mu_check(bigint_iseq(actual, q));
@@ -684,8 +559,7 @@ MU_TEST(test_div10_negpos)
 {
     BigInt *a = strtobi("-12");
     BigInt *b = strtobi("6");
-    uint8_t base = 10;
-    BigInt *q = bigint_divide(a, b, base);
+    BigInt *q = bigint_divide(a, b);
     BigInt *actual = strtobi("-2");
 
     mu_check(bigint_iseq(actual, q));
@@ -700,8 +574,7 @@ MU_TEST(test_div10_negpos_remain)
 {
     BigInt *a = strtobi("-127");
     BigInt *b = strtobi("61");
-    uint8_t base = 10;
-    BigInt *q = bigint_divide(a, b, base);
+    BigInt *q = bigint_divide(a, b);
     BigInt *actual = strtobi("-3");
 
     mu_check(bigint_iseq(actual, q));
@@ -716,8 +589,7 @@ MU_TEST(test_div10_posneg_remain)
 {
     BigInt *a = strtobi("127");
     BigInt *b = strtobi("-61");
-    uint8_t base = 10;
-    BigInt *q = bigint_divide(a, b, base);
+    BigInt *q = bigint_divide(a, b);
     BigInt *actual = strtobi("-2");
 
     mu_check(bigint_iseq(actual, q));
@@ -732,8 +604,7 @@ MU_TEST(test_div10_negneg_remain)
 {
     BigInt *a = strtobi("-127");
     BigInt *b = strtobi("-61");
-    uint8_t base = 10;
-    BigInt *q = bigint_divide(a, b, base);
+    BigInt *q = bigint_divide(a, b);
     BigInt *actual = strtobi("3");
 
     mu_check(bigint_iseq(actual, q));
@@ -748,8 +619,7 @@ MU_TEST(test_div10_negneg)
 {
     BigInt *a = strtobi("-952");
     BigInt *b = strtobi("-17");
-    uint8_t base = 10;
-    BigInt *q = bigint_divide(a, b, base);
+    BigInt *q = bigint_divide(a, b);
     BigInt *actual = strtobi("56");
 
     mu_check(bigint_iseq(actual, q));
@@ -764,8 +634,7 @@ MU_TEST(test_div10_posneg)
 {
     BigInt *a = strtobi("952");
     BigInt *b = strtobi("-17");
-    uint8_t base = 10;
-    BigInt *q = bigint_divide(a, b, base);
+    BigInt *q = bigint_divide(a, b);
     BigInt *actual = strtobi("-56");
 
     mu_check(bigint_iseq(actual, q));
@@ -780,8 +649,7 @@ MU_TEST(test_div10_pospos_reswith0)
 {
     BigInt *a = strtobi("24781");
     BigInt *b = strtobi("234");
-    uint8_t base = 10;
-    BigInt *q = bigint_divide(a, b, base);
+    BigInt *q = bigint_divide(a, b);
     BigInt *actual = strtobi("105");
 
     mu_check(bigint_iseq(actual, q));
@@ -810,8 +678,7 @@ MU_TEST(test_mod_pospos)
 {
     BigInt *a = strtobi("1242");
     BigInt *b = strtobi("54");
-    uint8_t base = 10;
-    BigInt *r = bigint_mod(a, b, base);
+    BigInt *r = bigint_mod(a, b);
 
     mu_check(bigint_iszero(r));
 
@@ -824,8 +691,7 @@ MU_TEST(test_mod_pospos_remain)
 {
     BigInt *a = strtobi("11471");
     BigInt *b = strtobi("473");
-    uint8_t base = 10;
-    BigInt *r = bigint_mod(a, b, base);
+    BigInt *r = bigint_mod(a, b);
     BigInt *actual = strtobi("119");
 
     mu_check(bigint_iseq(actual, r));
@@ -840,9 +706,8 @@ MU_TEST(test_mod_negpos_remain)
 {
     BigInt *a = strtobi("-24781");
     BigInt *b = strtobi("234");
-    uint8_t base = 10;
-    BigInt *q = bigint_divide(a, b, base);
-    BigInt *r = bigint_mod(a, b, base);
+    BigInt *q = bigint_divide(a, b);
+    BigInt *r = bigint_mod(a, b);
     BigInt *actual = strtobi("23");
 
     mu_check(bigint_iseq(actual, r));
@@ -925,11 +790,9 @@ MU_TEST_SUITE(suite_gcd)
 
 int main(int argc, char *argv[])
 {
-    MU_RUN_SUITE(suite_init);
     MU_RUN_SUITE(suite_str);
     MU_RUN_SUITE(suite_isless);
     MU_RUN_SUITE(suite_iszero);
-    MU_RUN_SUITE(suite_normalize);
     MU_RUN_SUITE(suite_iseq);
     MU_RUN_SUITE(suite_sum);
     MU_RUN_SUITE(suite_sub);
