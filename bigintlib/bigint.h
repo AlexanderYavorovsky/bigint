@@ -48,18 +48,18 @@ BigInt *bigint_divide(const BigInt *a, const BigInt *b);
 BigInt *bigint_mod(const BigInt *a, const BigInt *b);
 
 /* a += b */
-uint8_t bigint_add(BigInt **a, const BigInt *b);
+void bigint_add(BigInt **a, const BigInt *b);
 /* a -= b */
-uint8_t bigint_sub(BigInt **a, const BigInt *b);
+void bigint_sub(BigInt **a, const BigInt *b);
 /* a *= b */
-uint8_t bigint_mul(BigInt **a, const BigInt *b);
+void bigint_mul(BigInt **a, const BigInt *b);
 /* a += digit */
 uint8_t bigint_adddigit(BigInt **a, uint8_t digit);
 /* a*= digit */
 uint8_t bigint_muldigit(BigInt **a, uint8_t digit);
 
 /* a, b = b, a */
-uint8_t bigint_swap(BigInt **a, BigInt **b);
+void bigint_swap(BigInt **a, BigInt **b);
 
 /* returns the greates common divisor of a and b */
 BigInt *bigint_gcd(const BigInt *a, const BigInt *b);
