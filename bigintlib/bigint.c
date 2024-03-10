@@ -232,8 +232,7 @@ BigInt *postobi(uint8_t n)
 BigInt *bigint_sum(const BigInt *a, const BigInt *b)
 {
     BigInt *x;
-    uint8_t sum = 0;
-    uint8_t carry = 0;
+    uint8_t sum = 0, carry = 0;
 
     if (bigint_isless(a, b))
         return bigint_sum(b, a);
@@ -244,7 +243,6 @@ BigInt *bigint_sum(const BigInt *a, const BigInt *b)
             return NULL;
 
         bpos->sign = 1;
-
         x = bigint_subtract(a, bpos);
         bigint_free(bpos);
 
@@ -260,22 +258,13 @@ BigInt *bigint_sum(const BigInt *a, const BigInt *b)
         sum = a->digits[i] + carry;
         if (i < b->len)
             sum += b->digits[i];
-        
-        if (sum >= BASE)
-        {
-            carry = sum / BASE;
-            sum %= BASE;
-        }
-        else
-            carry = 0;
 
-        x->digits[i] = sum;
+        carry = sum / BASE;
+        x->digits[i] = sum % BASE;
     }
 
-    if (carry > 0)
-        x->digits[x->len - 1] = carry;
-    else
-        bigint_resize(x, x->len - 1);
+    x->digits[a->len] = carry;
+    bigint_normalize(x);
 
     return x;
 }
@@ -283,8 +272,7 @@ BigInt *bigint_sum(const BigInt *a, const BigInt *b)
 BigInt *bigint_subtract(const BigInt *a, const BigInt *b)
 {
     BigInt *x;
-    int8_t diff = 0;
-    int8_t borrow = 0;
+    int8_t diff = 0, borrow = 0;
 
     if (bigint_isless(a, b))
     {
@@ -300,7 +288,6 @@ BigInt *bigint_subtract(const BigInt *a, const BigInt *b)
             return NULL;
 
         bpos->sign = 1;
-
         x = bigint_sum(a, bpos);
         bigint_free(bpos);
 
@@ -369,10 +356,7 @@ BigInt *bigint_multiply(const BigInt *a, const BigInt *b)
 
 BigInt *bigint_factorial(const BigInt *a)
 {
-    BigInt *res;
-    BigInt *mul;
-    BigInt *one;
-    BigInt *top_bound;
+    BigInt *res, *mul, *one, *top_bound;
 
     if (a->sign != 1)
         return NULL;
