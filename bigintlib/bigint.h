@@ -1,4 +1,4 @@
-/* Yavorovsky Alexander, 22.02.2024 */
+/* Yavorovsky Alexander, 10.03.2024 */
 
 #include <stdint.h>
 
@@ -11,7 +11,7 @@ typedef struct
     size_t len;
 } BigInt;
 
-/* free memory allocated for x */
+/* free up memory allocated for x */
 void bigint_free(BigInt *x);
 
 /* returns copy of x */

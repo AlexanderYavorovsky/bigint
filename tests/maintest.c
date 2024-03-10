@@ -1,4 +1,4 @@
-/* Yavorovsky Alexander, 23.02.2024 */
+/* Yavorovsky Alexander, 10.03.2024 */
 
 #include <stdlib.h>
 #include <limits.h>

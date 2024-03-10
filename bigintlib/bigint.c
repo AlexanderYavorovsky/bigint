@@ -1,4 +1,4 @@
-/* Yavorovsky Alexander, 22.02.2024 */
+/* Yavorovsky Alexander, 10.03.2024 */
 
 #include <stdlib.h>
 #include <string.h>
@@ -197,7 +197,7 @@ char *bitostr(const BigInt *x)
     return str;
 }
 
-size_t _poslen(uint8_t n)
+static size_t bigint_poslen(uint8_t n)
 {
     size_t len = 0;
 
@@ -213,7 +213,7 @@ size_t _poslen(uint8_t n)
 BigInt *postobi(uint8_t n)
 {
     BigInt *x;
-    size_t len = _poslen(n);
+    size_t len = bigint_poslen(n);
     size_t cnt = 0;
 
     x = bigint_init_n(len);
@@ -441,7 +441,7 @@ uint8_t bigint_adddigit(BigInt **a, uint8_t digit)
     return 1;
 }
 
-void bigint_addoffset(BigInt **x, size_t offset)
+static void bigint_addoffset(BigInt **x, size_t offset)
 {
     BigInt *oldx;
 
