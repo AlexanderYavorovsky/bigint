@@ -138,11 +138,7 @@ uint8_t bigint_iseq(const BigInt *a, const BigInt *b)
     if (a->sign != b->sign || a->len != b->len)
         return 0;
 
-    for (size_t i = 0; i < a->len; i++)
-        if (a->digits[a->len - i - 1] != b->digits[b->len - i - 1])
-            return 0;
-
-    return 1;
+    return !memcmp(a->digits, b->digits, a->len * sizeof(*a->digits));
 }
 
 BigInt *strtobi(char *str)
