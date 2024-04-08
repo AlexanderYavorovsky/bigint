@@ -437,22 +437,25 @@ void bigint_mul(BigInt **a, const BigInt *b)
     bigint_free(old);
 }
 
-static void bigint_addoffset(BigInt **x, size_t offset)
+/* shift left */
+static bool bigint_shl(BigInt *x, size_t offset)
 {
-    BigInt *oldx;
+    if (x == NULL || offset == 0)
+        return false;
 
-    if (*x == NULL || offset == 0)
-        return;
+    uint8_t *old = x->digits;
+    uint8_t *tmp = calloc(x->len + offset, sizeof(*x->digits));
+    if (tmp == NULL)
+        return false;
 
-    oldx = *x;
-    *x = bigint_init_n(oldx->len + offset);
-    if (*x == NULL)
-        return;
+    memcpy(tmp + offset, old, x->len);
+    x->digits = tmp;
+    x->len += offset;
 
-    memcpy((*x)->digits + offset, oldx->digits, oldx->len);
-    bigint_normalize(*x);
+    bigint_normalize(x);
+    free(old);
 
-    bigint_free(oldx);
+    return true;
 }
 
 BigInt *bigint_divide(const BigInt *a, const BigInt *b)
@@ -483,11 +486,11 @@ BigInt *bigint_divide(const BigInt *a, const BigInt *b)
                 endflag = 1;
 
             digit = a->digits[cnt--];
-            bigint_addoffset(&cur, 1);
+            bigint_shl(cur, 1);
             bigint_add_absdigit(&cur, digit);
 
             if (was_division)
-                bigint_addoffset(&q, 1);
+                bigint_shl(q, 1);
         }
 
         while (bigint_isless(bpos, cur) || bigint_iseq(bpos, cur))
