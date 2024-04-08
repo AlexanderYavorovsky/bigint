@@ -45,21 +45,21 @@ BigInt *bigint_copy(const BigInt *x)
     return copy;
 }
 
-uint8_t bigint_fillzero(BigInt *x, size_t beg, size_t n)
+bool bigint_fillzero(BigInt *x, size_t beg, size_t n)
 {
     if (x == NULL || beg + n > x->len)
-        return 0;
+        return false;
 
     if (x->digits == NULL)
     {
         x->digits = malloc(x->len * sizeof(*x->digits));
         if (x->digits == NULL)
-            return 0;
+            return false;
     }
 
     memset(x->digits + beg, 0, n);
 
-    return 1;
+    return true;
 }
 
 static uint8_t bigint_resize(BigInt *x, size_t newlen)
@@ -105,12 +105,12 @@ static uint8_t bigint_normalize(BigInt *x)
     return 1;
 }
 
-uint8_t bigint_iszero(const BigInt *x)
+bool bigint_iszero(const BigInt *x)
 {
     return x->len == 1 && x->digits[0] == 0;
 }
 
-uint8_t bigint_isless(const BigInt *a, const BigInt *b)
+bool bigint_isless(const BigInt *a, const BigInt *b)
 {
     if (a->sign != b->sign)
         return a->sign != 1;
@@ -129,13 +129,13 @@ uint8_t bigint_isless(const BigInt *a, const BigInt *b)
             return a->sign != 1;
     }
     
-    return 0;
+    return false;
 }
 
-uint8_t bigint_iseq(const BigInt *a, const BigInt *b)
+bool bigint_iseq(const BigInt *a, const BigInt *b)
 {
     if (a->sign != b->sign || a->len != b->len)
-        return 0;
+        return false;
 
     return !memcmp(a->digits, b->digits, a->len * sizeof(*a->digits));
 }
@@ -413,7 +413,7 @@ void bigint_mul(BigInt **a, const BigInt *b)
     bigint_free(old);
 }
 
-uint8_t bigint_adddigit(BigInt **a, uint8_t digit)
+bool bigint_adddigit(BigInt **a, uint8_t digit)
 {
     uint8_t sum, carry = 0;
     size_t len = (*a)->len;
@@ -433,7 +433,7 @@ uint8_t bigint_adddigit(BigInt **a, uint8_t digit)
     if (carry > 0 && bigint_resize(*a, len + 1))
             (*a)->digits[len] = carry;
 
-    return 1;
+    return true;
 }
 
 static void bigint_addoffset(BigInt **x, size_t offset)

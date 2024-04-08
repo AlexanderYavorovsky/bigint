@@ -1,6 +1,7 @@
 /* Yavorovsky Alexander, 10.03.2024 */
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #define BASE 10
 
@@ -18,14 +19,14 @@ void bigint_free(BigInt *x);
 BigInt *bigint_copy(const BigInt *x);
 
 /* fill x->digits with zeroes from position beg to position n*/
-uint8_t bigint_fillzero(BigInt *x, size_t beg, size_t n);
+bool bigint_fillzero(BigInt *x, size_t beg, size_t n);
 
 /* returns 1 if a == 0 */
-uint8_t bigint_iszero(const BigInt *x);
+bool bigint_iszero(const BigInt *x);
 /* returns 1 if a < b, 0 otherwise */
-uint8_t bigint_isless(const BigInt *a, const BigInt *b);
+bool bigint_isless(const BigInt *a, const BigInt *b);
 /* returns 1 if a == b */
-uint8_t bigint_iseq(const BigInt *a, const BigInt *b);
+bool bigint_iseq(const BigInt *a, const BigInt *b);
 
 /* make BigInt from string */
 BigInt *strtobi(char *str);
@@ -54,7 +55,7 @@ void bigint_sub(BigInt **a, const BigInt *b);
 /* a *= b */
 void bigint_mul(BigInt **a, const BigInt *b);
 /* a += digit */
-uint8_t bigint_adddigit(BigInt **a, uint8_t digit);
+bool bigint_adddigit(BigInt **a, uint8_t digit);
 
 /* a, b = b, a */
 void bigint_swap(BigInt **a, BigInt **b);
