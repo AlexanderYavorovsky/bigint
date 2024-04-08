@@ -488,26 +488,12 @@ MU_TEST(test_postobi)
     bigint_free(actual);
 }
 
-MU_TEST(test_adddigit)
-{
-    BigInt *x = strtobi("9999999");
-    uint8_t digit = 9;
-    BigInt *actual = strtobi("10000008");
-
-    bigint_adddigit(&x, digit);
-    mu_check(bigint_iseq(actual, x));
-
-    bigint_free(x);
-    bigint_free(actual);
-}
-
 MU_TEST_SUITE(suite_short)
 {
     MU_RUN_TEST(test_add10);
     MU_RUN_TEST(test_sub10);
     MU_RUN_TEST(test_mul10);
     MU_RUN_TEST(test_postobi);
-    MU_RUN_TEST(test_adddigit);
 }
 
 MU_TEST(test_div10_self)
