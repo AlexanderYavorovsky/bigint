@@ -109,12 +109,12 @@ bool bigint_fillzero(BigInt *x, size_t beg, size_t n)
     return true;
 }
 
-static uint8_t bigint_normalize(BigInt *x)
+static bool bigint_normalize(BigInt *x)
 {
     size_t cnt, newlen;
 
     if (x == NULL)
-        return 0;
+        return false;
 
     cnt = x->len - 1;
     while (cnt && x->digits[cnt] == 0)
@@ -126,7 +126,7 @@ static uint8_t bigint_normalize(BigInt *x)
     if (x->len == 1 && x->digits[0] == 0)
         x->sign = 1;
 
-    return 1;
+    return true;
 }
 
 bool bigint_iszero(const BigInt *x)
