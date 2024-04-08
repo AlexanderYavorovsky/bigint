@@ -540,7 +540,7 @@ BigInt *bigint_mod(const BigInt *a, const BigInt *b)
     return r;
 }
 
-void bigint_swap(BigInt **a, BigInt **b)
+static void bigint_swap(BigInt **a, BigInt **b)
 {
     BigInt *tmp;
 

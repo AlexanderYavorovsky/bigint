@@ -55,8 +55,5 @@ void bigint_sub(BigInt **a, const BigInt *b);
 /* a *= b */
 void bigint_mul(BigInt **a, const BigInt *b);
 
-/* a, b = b, a */
-void bigint_swap(BigInt **a, BigInt **b);
-
 /* returns the greates common divisor of a and b */
 BigInt *bigint_gcd(const BigInt *a, const BigInt *b);
