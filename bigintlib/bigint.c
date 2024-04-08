@@ -29,25 +29,25 @@ static bool bigint_resize(BigInt *x, size_t newlen)
 }
 
 /* |a| += digit */
-static bool bigint_add_absdigit(BigInt **a, uint8_t digit)
+static bool bigint_add_absdigit(BigInt *a, uint8_t digit)
 {
     uint8_t sum, carry = 0;
-    size_t len = (*a)->len;
+    size_t len = a->len;
 
     for (size_t i = 0; i < len; i++)
     {
-        sum = (*a)->digits[i] + carry;
+        sum = a->digits[i] + carry;
         if (i == 0)
             sum += digit;
 
         carry = sum / BASE;
-        (*a)->digits[i] = sum % BASE;
+        a->digits[i] = sum % BASE;
         if (carry == 0)
             break;
     }
 
-    if (carry > 0 && bigint_resize(*a, len + 1))
-            (*a)->digits[len] = carry;
+    if (carry > 0 && bigint_resize(a, len + 1))
+            a->digits[len] = carry;
 
     return true;
 }
@@ -394,7 +394,7 @@ BigInt *bigint_factorial(const BigInt *a)
     while (bigint_isless(mul, top_bound))
     {
         bigint_mul(&res, mul);
-        bigint_add_absdigit(&mul, 1);
+        bigint_add_absdigit(mul, 1);
 
         if (res == NULL || mul == NULL)
         {
@@ -487,7 +487,7 @@ BigInt *bigint_divide(const BigInt *a, const BigInt *b)
 
             digit = a->digits[cnt--];
             bigint_shl(cur, 1);
-            bigint_add_absdigit(&cur, digit);
+            bigint_add_absdigit(cur, digit);
 
             if (was_division)
                 bigint_shl(q, 1);
@@ -500,11 +500,11 @@ BigInt *bigint_divide(const BigInt *a, const BigInt *b)
         }
 
         was_division = 1;
-        bigint_add_absdigit(&q, divcnt);
+        bigint_add_absdigit(q, divcnt);
     }
 
     if (a->sign != 1 && !bigint_iszero(cur))
-        bigint_add_absdigit(&q, 1);
+        bigint_add_absdigit(q, 1);
 
     q->sign = a->sign * b->sign;
 
