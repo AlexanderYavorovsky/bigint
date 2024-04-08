@@ -5,6 +5,53 @@
 
 #include "bigint.h"
 
+static bool bigint_resize(BigInt *x, size_t newlen)
+{
+    uint8_t *tmp;
+    size_t oldlen;
+
+    if (newlen == 0 || x == NULL)
+        return false;
+
+    tmp = realloc(x->digits, newlen);
+    if (tmp == NULL)
+        return false;
+
+    x->digits = tmp;
+
+    oldlen = x->len;
+    x->len = newlen;
+
+    if (newlen > oldlen)
+        return bigint_fillzero(x, oldlen, newlen - oldlen);
+
+    return true;
+}
+
+/* |a| += digit */
+static bool bigint_add_absdigit(BigInt **a, uint8_t digit)
+{
+    uint8_t sum, carry = 0;
+    size_t len = (*a)->len;
+
+    for (size_t i = 0; i < len; i++)
+    {
+        sum = (*a)->digits[i] + carry;
+        if (i == 0)
+            sum += digit;
+
+        carry = sum / BASE;
+        (*a)->digits[i] = sum % BASE;
+        if (carry == 0)
+            break;
+    }
+
+    if (carry > 0 && bigint_resize(*a, len + 1))
+            (*a)->digits[len] = carry;
+
+    return true;
+}
+
 void bigint_free(BigInt *x)
 {
     if (x->digits != NULL)
@@ -60,29 +107,6 @@ bool bigint_fillzero(BigInt *x, size_t beg, size_t n)
     memset(x->digits + beg, 0, n);
 
     return true;
-}
-
-static uint8_t bigint_resize(BigInt *x, size_t newlen)
-{
-    uint8_t *tmp;
-    size_t oldlen;
-
-    if (newlen == 0 || x == NULL)
-        return 0;
-
-    tmp = realloc(x->digits, newlen);
-    if (tmp == NULL)
-        return 0;
-
-    x->digits = tmp;
-
-    oldlen = x->len;
-    x->len = newlen;
-
-    if (newlen > oldlen)
-        return bigint_fillzero(x, oldlen, newlen - oldlen);
-
-    return 1;
 }
 
 static uint8_t bigint_normalize(BigInt *x)
@@ -370,7 +394,7 @@ BigInt *bigint_factorial(const BigInt *a)
     while (bigint_isless(mul, top_bound))
     {
         bigint_mul(&res, mul);
-        bigint_adddigit(&mul, 1);
+        bigint_add_absdigit(&mul, 1);
 
         if (res == NULL || mul == NULL)
         {
@@ -411,29 +435,6 @@ void bigint_mul(BigInt **a, const BigInt *b)
     old = *a;
     *a = bigint_multiply(*a, b);
     bigint_free(old);
-}
-
-bool bigint_adddigit(BigInt **a, uint8_t digit)
-{
-    uint8_t sum, carry = 0;
-    size_t len = (*a)->len;
-
-    for (size_t i = 0; i < len; i++)
-    {
-        sum = (*a)->digits[i] + carry;
-        if (i == 0)
-            sum += digit;
-
-        carry = sum / BASE;
-        (*a)->digits[i] = sum % BASE;
-        if (carry == 0)
-            break;
-    }
-
-    if (carry > 0 && bigint_resize(*a, len + 1))
-            (*a)->digits[len] = carry;
-
-    return true;
 }
 
 static void bigint_addoffset(BigInt **x, size_t offset)
@@ -483,7 +484,7 @@ BigInt *bigint_divide(const BigInt *a, const BigInt *b)
 
             digit = a->digits[cnt--];
             bigint_addoffset(&cur, 1);
-            bigint_adddigit(&cur, digit);
+            bigint_add_absdigit(&cur, digit);
 
             if (was_division)
                 bigint_addoffset(&q, 1);
@@ -496,11 +497,11 @@ BigInt *bigint_divide(const BigInt *a, const BigInt *b)
         }
 
         was_division = 1;
-        bigint_adddigit(&q, divcnt);
+        bigint_add_absdigit(&q, divcnt);
     }
 
     if (a->sign != 1 && !bigint_iszero(cur))
-        bigint_adddigit(&q, 1);
+        bigint_add_absdigit(&q, 1);
 
     q->sign = a->sign * b->sign;
 
