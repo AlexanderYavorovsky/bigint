@@ -57,8 +57,7 @@ uint8_t bigint_fillzero(BigInt *x, size_t beg, size_t n)
             return 0;
     }
 
-    for (size_t i = beg; i < beg + n; i++)
-        x->digits[i] = 0;
+    memset(x->digits + beg, 0, n);
 
     return 1;
 }
