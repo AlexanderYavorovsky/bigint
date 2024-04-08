@@ -18,7 +18,7 @@ static BigInt *bigint_init_n(size_t len)
     if(x == NULL)
         return NULL;
     
-    x->digits = calloc(len, sizeof(x->digits));
+    x->digits = calloc(len, sizeof(*x->digits));
     if (x->digits == NULL)
     {
         free(x);
@@ -52,7 +52,7 @@ uint8_t bigint_fillzero(BigInt *x, size_t beg, size_t n)
 
     if (x->digits == NULL)
     {
-        x->digits = malloc(x->len * sizeof(x->digits));
+        x->digits = malloc(x->len * sizeof(*x->digits));
         if (x->digits == NULL)
             return 0;
     }
@@ -174,7 +174,7 @@ char *bitostr(const BigInt *x)
 {
     uint8_t offset = 0;
     size_t slen = x->len + 1 + (x->sign == -1);
-    char *str = malloc(slen * sizeof(char));
+    char *str = malloc(slen * sizeof(*str));
 
     if (str == NULL)
         return NULL;
